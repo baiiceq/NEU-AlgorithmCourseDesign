@@ -33,7 +33,7 @@ void MazeLayer::divide(int x, int y, int width, int height)
 
 	if (do_vertical) 
 	{
-		if (width <= 3) return;
+		if (width < 3) return;
 
 		int wall_x;
 		bool valid = false;
@@ -81,7 +81,7 @@ void MazeLayer::divide(int x, int y, int width, int height)
 	}
 	else 
 	{
-		if (height <= 3) return;
+		if (height < 3) return;
 
 		int wall_y;
 		bool valid = false;
