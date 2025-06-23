@@ -44,18 +44,22 @@ void Player::on_input(const ExMessage& msg, const MazeLayer& ml)
 
 	if (msg.message == WM_KEYDOWN)
 	{
-		switch (msg.wParam)
+		switch (msg.vkcode)
 		{
 		case VK_LEFT:
+		case 0x41:
 			move_to(pos + Vector2(-1, 0), ml);
 			break;
 		case VK_RIGHT:
+		case 0x44:
 			move_to(pos + Vector2(1, 0), ml);
 			break;
 		case VK_UP:
+		case 0x57:
 			move_to(pos + Vector2(0, -1), ml);
 			break;
 		case VK_DOWN:
+		case 0x53:
 			move_to(pos + Vector2(0, 1), ml);
 			break;
 		default:
@@ -73,12 +77,18 @@ void Player::on_update(int delta)
 	{
 		timer_move.on_update(delta);
 		is_idle = false;
-		if (image_pos.x < Grid::get_image_pos(pos).x)
+		if (image_pos.x <= Grid::get_image_pos(pos).x)
 			is_facing_right = true;
+		else
+			is_facing_right = false;
 
 		float t = timer_move.get_ratio();
 		image_pos = image_pos + (target_image_pos - image_pos) * t;
 
+	}
+	else
+	{
+		is_idle = true;
 	}
 
 
@@ -112,26 +122,26 @@ void Player::on_render()
 	{
 		if (is_facing_right)
 		{
-			anim_idle_right.set_position(image_pos);
-			anim_idle_right.on_render();
+			anim_idle_right.set_position(image_pos + Vector2(OFFESET_X, OFFESET_Y));
+			anim_idle_right.on_render(0.3);
 		}
 		else
 		{
-			anim_idle_left.set_position(image_pos);
-			anim_idle_left.on_render();
+			anim_idle_left.set_position(image_pos + Vector2(OFFESET_X, OFFESET_Y));
+			anim_idle_left.on_render(0.3);
 		}
 	}
 	else
 	{
 		if (is_facing_right)
 		{
-			anim_run_right.set_position(image_pos);
-			anim_run_right.on_render();
+			anim_run_right.set_position(image_pos + Vector2(OFFESET_X, OFFESET_Y));
+			anim_run_right.on_render(0.3);
 		}
 		else
 		{
-			anim_run_left.set_position(image_pos);
-			anim_run_left.on_render();
+			anim_run_left.set_position(image_pos + Vector2(OFFESET_X, OFFESET_Y));
+			anim_run_left.on_render(0.3);
 		}
 	}
 }

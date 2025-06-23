@@ -21,8 +21,8 @@ void MazeGame::on_render()
 {
 	if (state == start)
 	{
-		player.on_render();
 		maze.on_render(now_layer);
+		player.on_render();
 	}
 }
 

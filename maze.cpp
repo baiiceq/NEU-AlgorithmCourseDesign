@@ -5,7 +5,7 @@
 
 MazeLayer::MazeLayer(int rows, int cols, bool isFog) : rows(rows), cols(cols), isFogLayer(isFog)
 {
-	grid.resize(rows, std::vector<TileType>(cols, TileType::Empty));
+	grid.resize(rows, std::vector<Tile>(cols, Tile(TileType::Empty)));
 }
 
 void MazeLayer::divide(int x, int y, int width, int height)
@@ -48,7 +48,7 @@ void MazeLayer::divide(int x, int y, int width, int height)
 			bool has_door = false;
 			for (int i = max(0, y - 1); i < min(y + height + 1, cols) ; i++)
 			{
-				if (grid[i][wall_x] == TileType::DOOR)
+				if (grid[i][wall_x].get_type() == TileType::DOOR)
 				{
 					has_door = true;
 					break;
@@ -96,7 +96,7 @@ void MazeLayer::divide(int x, int y, int width, int height)
 			bool has_door = false;
 			for (int i = max(0, x - 1); i < min(x + width + 1, rows); i++) 
 			{
-				if (grid[wall_y][i] == TileType::DOOR) 
+				if (grid[wall_y][i].get_type() == TileType::DOOR)
 				{
 					has_door = true;
 					break;
@@ -125,19 +125,9 @@ void MazeLayer::divide(int x, int y, int width, int height)
 		}
 
 		// 递归上下区域
-		divide(x, y, width, wall_y - y);                      // 上区域
+		divide(x, y, width, wall_y - y);                       // 上区域
 		divide(x, wall_y + 1, width, y + height - wall_y - 1); // 下区域
 	}
-}
-
-TileType MazeLayer::getTile(int x, int y) const
-{
-	return grid[x][y];
-}
-
-void MazeLayer::setTile(int y, int x, TileType type)
-{
-	grid[x][y] = type;
 }
 
 int MazeLayer::getRows() const
@@ -168,7 +158,7 @@ void MazeLayer::on_render()
 	{
 		for (int j = 0; j < cols; j++)
 		{
-			if (grid[i][j] == TileType::Wall)
+			if (grid[i][j].get_type() == TileType::Wall)
 			{
 				Rect rect = { Grid::toPixelX(i), Grid::toPixelY(j), TILE_SIZE, TILE_SIZE};
 				putimage_alpha(ResourcesManager::instance()->find_image("wall"), &rect);

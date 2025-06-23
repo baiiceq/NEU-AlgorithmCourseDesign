@@ -3,27 +3,13 @@
 #include "util.h"
 #include "random.h"
 #include <vector>
-
-enum class TileType 
-{
-    Wall,
-    Path,
-    Start,
-    Exit,
-    Gold,
-    Trap,
-    Locker,
-    Boss,
-    Empty = -1,
-    DOOR = -2
-};
-
+#include "tile.h"
 
 class MazeLayer 
 {
 private:
     int rows, cols;
-    std::vector<std::vector<TileType>> grid;
+    std::vector<std::vector<Tile>> grid;
     bool isFogLayer;  // 是否为迷雾层
 
     void divide(int left, int top, int right, int bottom);
@@ -31,8 +17,15 @@ private:
 public:
     MazeLayer(int rows, int cols, bool isFog = false);
 
-    TileType getTile(int x, int y) const;
-    void setTile(int x, int y, TileType type);
+    Tile get_tile(int x, int y) const
+    {
+        return grid[x][y];
+    }
+
+    void set_tile(int x, int y, Tile type)
+    {
+		grid[x][y] = type;
+    }
 
     int getRows() const;
     int getCols() const;
@@ -41,14 +34,11 @@ public:
     void generate();  // 分治生成本层
     void on_render();
 
-    const std::vector<std::vector<TileType>>& getGrid() const { return grid; }
+    const std::vector<std::vector<Tile>>& getGrid() const { return grid; }
 
     bool isWalkable(int x, int y) const
     {
-		if (grid[x][y] != TileType::Wall)
-			return true;
-
-        return false;
+		return grid[x][y].is_walkable();
     }
 
 };

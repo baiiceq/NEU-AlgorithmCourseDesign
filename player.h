@@ -12,7 +12,7 @@
 class Player
 {
 public:
-    Player(Vector2 start = {10, 10}, int hp = 100, int initResource = 0);
+    Player(Vector2 start = {0, 0}, int hp = 100, int initResource = 0);
 
     void on_input(const ExMessage& msg, const MazeLayer& ml);
 
@@ -53,4 +53,7 @@ private:
 
 	const int RUN_TIME = 500; // 移动一格的时间 
     Timer timer_move;
+
+    const int OFFESET_X = 70;
+    const int OFFESET_Y = 130;
 };
