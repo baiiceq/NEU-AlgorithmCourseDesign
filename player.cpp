@@ -49,18 +49,46 @@ void Player::on_input(const ExMessage& msg, const MazeLayer& ml)
 		case VK_LEFT:
 		case 0x41:
 			move_to(pos + Vector2(-1, 0), ml);
+			is_running_left = true;
 			break;
 		case VK_RIGHT:
 		case 0x44:
 			move_to(pos + Vector2(1, 0), ml);
+			is_running_right = true;
 			break;
 		case VK_UP:
 		case 0x57:
 			move_to(pos + Vector2(0, -1), ml);
+			is_running_up = true;
 			break;
 		case VK_DOWN:
 		case 0x53:
 			move_to(pos + Vector2(0, 1), ml);
+			is_running_down = true;
+			break;
+		default:
+			break;
+		}
+	}
+	else if (msg.message == WM_KEYUP)
+	{
+		switch (msg.vkcode)
+		{
+		case VK_LEFT:
+		case 0x41:
+			is_running_left = false;
+			break;
+		case VK_RIGHT:
+		case 0x44:
+			is_running_right = false;
+			break;
+		case VK_UP:
+		case 0x57:
+			is_running_up = false;
+			break;
+		case VK_DOWN:
+		case 0x53:
+			is_running_down = false;
 			break;
 		default:
 			break;
@@ -70,7 +98,6 @@ void Player::on_input(const ExMessage& msg, const MazeLayer& ml)
 
 void Player::on_update(int delta)
 {
-	std::cout << pos.x << " " << pos.y << std::endl;
 	Vector2 target_image_pos = Grid::get_image_pos(pos);
 
 	if (!(image_pos == target_image_pos))
@@ -153,4 +180,10 @@ void Player::move_to(Vector2 pos, const MazeLayer& ml)
 		this->pos = pos; 
 		timer_move.restart();
 	}
+}
+
+void Player::set_position(Vector2 pos)
+{
+	this->pos = pos;
+	image_pos = Grid::get_image_pos(pos);	
 }

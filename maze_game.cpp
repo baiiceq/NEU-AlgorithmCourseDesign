@@ -4,7 +4,7 @@ MazeGame::MazeGame(int layers, int rows, int cols) : maze(layers, rows, cols),la
 {
 	// ≥ı ºªØ√‘π¨
 	maze.generate(0);
-
+	player.set_position(maze.get_start_pos(0));
 	state = start;
 }
 

@@ -10,12 +10,20 @@ class MazeLayer
 private:
     int rows, cols;
     std::vector<std::vector<Tile*>> grid;
-    bool isFogLayer;  // 是否为迷雾层
+
+    Vector2 end_pos;
+    Vector2 start_pos;
+    std::vector<Vector2> gold_pos;
+    std::vector<Vector2> trap_pos;
 
     void divide(int left, int top, int right, int bottom);
 
+    void generate_entry_and_exit();
+
+	void generate_gold_and_trap();
+
 public:
-    MazeLayer(int rows, int cols, bool isFog = false);
+    MazeLayer(int rows, int cols);
 
     ~MazeLayer();
 
@@ -26,7 +34,6 @@ public:
 
     int getRows() const;
     int getCols() const;
-    bool isFog() const;
 
     void generate();  // 分治生成本层
 
@@ -40,6 +47,13 @@ public:
 		return grid[x][y]->is_walkable();
     }
 
+	Vector2 get_start_pos() { return start_pos; }
+
+	Vector2 get_end_pos() { return end_pos; }
+
+	const std::vector<Vector2>& get_gold_pos() const { return gold_pos; }
+
+	const std::vector<Vector2>& get_trap_pos() const { return trap_pos; }
 };
 
 
@@ -58,6 +72,11 @@ public:
 	{
 		return maze[layer];
 	}
+
+    Vector2 get_start_pos(int layer) { return maze[layer].get_start_pos(); }
+
+    Vector2 get_end_pos(int layer) { return maze[layer].get_end_pos(); }
+
 private:
     int layers, rows, cols;
     std::vector<MazeLayer> maze;

@@ -117,3 +117,9 @@ inline std::wstring get_current_time()
 		st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
 	return buf;
 }
+
+template<typename T>
+T clamp(T val, T min_val, T max_val) 
+{
+	return max(min_val, min(val, max_val));
+}

@@ -27,9 +27,6 @@
     <ClCompile Include="boss.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="trap.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Puzzle.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -45,6 +42,9 @@
     <ClCompile Include="resources_manager.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="tile.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="maze.h">
@@ -54,9 +54,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="boss.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="trap.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Puzzle.h">
@@ -87,6 +84,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="timer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="tile.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -136,7 +136,7 @@
     <ClCompile Include="player.cpp" />
     <ClCompile Include="Puzzle.cpp" />
     <ClCompile Include="random.cpp" />
-    <ClCompile Include="trap.cpp" />
+    <ClCompile Include="tile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="animation.h" />
@@ -149,8 +149,8 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="Puzzle.h" />
     <ClInclude Include="random.h" />
+    <ClInclude Include="tile.h" />
     <ClInclude Include="timer.h" />
-    <ClInclude Include="trap.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="vector2.h" />
   </ItemGroup>

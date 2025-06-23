@@ -21,6 +21,8 @@ public:
 	void on_render();
 
     void move_to(Vector2 pos, const MazeLayer& ml);
+
+	void set_position(Vector2 pos);
     Vector2 getPosition() const;
 
     int getResource() const;
@@ -50,6 +52,11 @@ private:
     Animation anim_idle_right;
     Animation anim_run_left;
     Animation anim_run_right;
+
+    bool is_running_right = false;
+    bool is_running_left = false;
+    bool is_running_up = false;
+    bool is_running_down = false;
 
 	const int RUN_TIME = 500; // 移动一格的时间 
     Timer timer_move;

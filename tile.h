@@ -6,7 +6,7 @@ enum class TileType
     Wall,
     Path,
     Start,
-    Exit,
+    End,
     Gold,
     Trap,
     Locker,
@@ -69,14 +69,43 @@ private:
 class Trap : public Tile
 {
 public:
-	Trap(int damage = 10) : Tile(TileType::Trap), damage(damage) {}
+    Trap(int damage = 10);
 
 	int get_damage() const { return damage; }
 	void set_damage(int new_damage) { damage = new_damage; }
 
-    void set_triggered(bool triggered) { is_triggered = triggered; }
+    void on_render() override;
+    void on_update(int delta) override;
 
 private:
 	int damage;  // 陷阱造成的伤害
-    bool is_triggered = false;  // 是否被触发过
+
+    Animation anim_trap;
+
+    const int OFFSET_X = 20;
+    const int OFFSET_Y = 36;
+};
+
+class Start : public Tile
+{
+public:
+	Start() : Tile(TileType::Start) {}
+
+    void on_render() override;
+
+private:
+	const int OFFSET_X = 20;
+	const int OFFSET_Y = 36;
+};
+
+class End : public Tile
+{
+public:
+    End() : Tile(TileType::End) {}
+
+    void on_render() override;
+
+private:
+    const int OFFSET_X = 20;
+    const int OFFSET_Y = 36;
 };

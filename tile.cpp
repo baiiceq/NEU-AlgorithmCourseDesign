@@ -50,3 +50,40 @@ void Gold::on_update(int delta)
 	anim_gold.on_update(delta);
 }
 
+Trap::Trap(int damage) : Tile(TileType::Trap), damage(damage)
+{
+	anim_trap.add_frame(ResourcesManager::instance()->find_image("trap"), 8);
+	anim_trap.set_position(Grid::get_image_pos(pos));
+	anim_trap.set_anchor_mode(Animation::AnchorMode::BottomCentered);
+	anim_trap.set_loop(true);
+	anim_trap.set_interval(120);
+}
+
+void Trap::on_render()
+{
+	Tile::on_render();
+
+	anim_trap.set_position(Grid::get_image_pos(pos) + Vector2(OFFSET_X, OFFSET_Y));
+	anim_trap.on_render();
+}
+
+void Trap::on_update(int delta)
+{
+	anim_trap.on_update(delta);
+}
+
+void Start::on_render()
+{
+	Tile::on_render();
+	const int TILE_SIZE = Grid::cellSize;
+	Rect rect = { Grid::toPixelX(pos.x), Grid::toPixelY(pos.y), TILE_SIZE, TILE_SIZE };
+	putimage_alpha(ResourcesManager::instance()->find_image("start"), &rect);
+}
+
+void End::on_render()
+{
+	Tile::on_render();
+	const int TILE_SIZE = Grid::cellSize;
+	Rect rect = { Grid::toPixelX(pos.x), Grid::toPixelY(pos.y), TILE_SIZE, TILE_SIZE };
+	putimage_alpha(ResourcesManager::instance()->find_image("exit"), &rect);
+}

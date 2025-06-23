@@ -20,6 +20,9 @@ static const std::vector<ImageResInfo> image_info_list =
 {
 	{"floor",                  _T(R"(resources\floor.png)")},
 	{"wall",                   _T(R"(resources\wall.png)")},
+	{"trap",                   _T(R"(resources\trap.png)")},
+	{"start",                  _T(R"(resources\start.png)")},
+	{"exit",                   _T(R"(resources\exit.png)")},
 };
 
 static const std::vector<AtlasResInfo> atlas_info_list =

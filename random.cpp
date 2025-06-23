@@ -25,11 +25,9 @@ bool Random::chance(double probability)
     return dist(rng);
 }
 
-template<typename T>
-T Random::choice(const std::vector<T>& vec)
+float Random::lerp(float a, float b, float t)
 {
-    std::uniform_int_distribution<size_t> dist(0, vec.size() - 1);
-    return vec[dist(rng)];
+    return a * (1 - t) + b * t;
 }
 
 template int Random::choice<int>(const std::vector<int>&);
