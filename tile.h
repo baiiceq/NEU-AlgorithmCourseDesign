@@ -1,4 +1,5 @@
 #pragma once
+#include "animation.h"
 
 enum class TileType
 {
@@ -22,25 +23,36 @@ public:
     TileType get_type() const { return type; }
     void set_type(TileType new_type) { type = new_type; }
 
+    virtual void on_render() = 0;
+
     bool is_walkable() const
     {
         return type != TileType::Wall;
     }
 
-private:
+protected:
     TileType type;
+    Vector2 pos;
 };
+
 
 class Gold : public Tile
 {
 public:
-	Gold(int value = 5) : Tile(TileType::Gold), value(value) {}
+    Gold(int value = 5);
 
 	int get_value() const { return value; }
 	void set_value(int new_value) { value = new_value; }
 
+	void set_triggered(bool triggered) { is_triggered = triggered; }
+
+    void on_render() override;
+
 private:
 	int value;  // 金币的价值
+	bool is_triggered = false;  // 是否被触发过
+
+    Animation anim_gold;
 };
 
 class Trap : public Tile
@@ -51,6 +63,9 @@ public:
 	int get_damage() const { return damage; }
 	void set_damage(int new_damage) { damage = new_damage; }
 
+    void set_triggered(bool triggered) { is_triggered = triggered; }
+
 private:
 	int damage;  // 陷阱造成的伤害
+    bool is_triggered = false;  // 是否被触发过
 };

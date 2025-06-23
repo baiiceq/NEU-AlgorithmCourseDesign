@@ -26,6 +26,7 @@ static const std::vector<AtlasResInfo> atlas_info_list =
 {
 	{"player_run_right",             _T(R"(resources\player\run\%d.png)") ,     6},
 	{"player_idle_right",            _T(R"(resources\player\idle\%d.png)") ,    4},
+	{"gold",                         _T(R"(resources\coin\Gold_%d.png)") ,      10},
 };
 
 static inline bool check_image_valid(IMAGE* image)
