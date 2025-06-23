@@ -112,7 +112,7 @@ public:
 		timer.on_update((int)delta);
 	}
 
-	void on_render(Camera camera, int magnification_factor = 1)
+	void on_render(float magnification_factor = 1)
 	{
 		const Frame& frame = frame_list[idx_frame];
 
@@ -122,7 +122,7 @@ public:
 			? (int)position.y - frame.rect_src.h / 2 : (int)position.y - frame.rect_src.h;
 		rect_dst.w = frame.rect_src.w * magnification_factor, rect_dst.h = frame.rect_src.h * magnification_factor;
 
-		putimage_alpha(&camera, frame.image, &rect_dst, &frame.rect_src);
+		putimage_alpha(frame.image, &rect_dst, &frame.rect_src);
 	}
 
 

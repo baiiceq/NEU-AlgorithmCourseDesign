@@ -3,10 +3,10 @@
 class Boss 
 {
 public:
-    Boss(Position pos, int hp = 30);
+    Boss(Vector2 pos, int hp = 30);
     int getHP() const;
 
 private:
     int hp;
-    Position pos;
+    Vector2 pos;
 };

@@ -2,34 +2,13 @@
 #include <graphics.h>
 #include "random.h"
 #include "maze.h"
+#include "maze_game.h"
 
-void draw_maze(MazeLayer ml)
-{
-	int TILE_SIZE = 40;
-	auto grid = ml.getGrid();
-	for (int i = 0; i < ml.getRows(); i++)
-	{
-		for (int j = 0; j < ml.getCols(); j++)
-		{
-			if (grid[i][j] == TileType::Wall)
-			{
-				// Draw wall tile
-				Rect rect = { j * TILE_SIZE, i * TILE_SIZE, TILE_SIZE, TILE_SIZE };
-				putimage_alpha(ResourcesManager::instance()->find_image("wall"), &rect);
-			}
-			else if (grid[i][j] == TileType::Empty || grid[i][j] == TileType::DOOR)
-			{
-				// Draw empty tile
-				Rect rect = { j * TILE_SIZE, i * TILE_SIZE, TILE_SIZE, TILE_SIZE };
-				putimage_alpha(ResourcesManager::instance()->find_image("floor"), &rect);
-			}
-		}
-	}
-}
 
 int main()
 {
-	HWND hwnd = initgraph(40 * 22, 40 * 22, EW_SHOWCONSOLE);
+	HWND hwnd = initgraph(800, 800, EW_SHOWCONSOLE);
+
 	try
 	{
 		ResourcesManager::instance()->load();
@@ -42,11 +21,47 @@ int main()
 		return -1;
 	}
 
-	Random::init();  
-	MazeLayer maze(22, 22, false); 
-	maze.generate();
-	maze.print();
-	draw_maze(maze);
-	system("pause");
+	Random::init();
+
+	ExMessage msg;
+	const int FPS = 60;
+
+	bool running = true;
+
+	MazeGame game(3, 20, 20);
+
+	BeginBatchDraw();
+
+	
+
+	while (running)
+	{
+		DWORD frame_start_time = GetTickCount();
+
+		while (peekmessage(&msg))
+		{
+			game.on_input(msg);
+		}
+
+		static DWORD last_tick_time = GetTickCount();
+		DWORD current_tick_time = GetTickCount();
+		DWORD delta_tick = current_tick_time - last_tick_time;
+		last_tick_time = current_tick_time;
+
+		game.on_update(delta_tick);
+
+		cleardevice();
+
+		game.on_render();
+
+		FlushBatchDraw();
+		
+		DWORD frame_end_time = GetTickCount();
+		DWORD frame_delta_time = frame_end_time - frame_start_time;
+		if (frame_delta_time < 1000 / FPS)
+			Sleep(1000 / FPS - frame_delta_time);
+	}
+	EndBatchDraw();
+
 	return 0;
 }

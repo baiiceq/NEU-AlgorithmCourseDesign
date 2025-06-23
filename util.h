@@ -4,15 +4,40 @@
 #include <windows.h>
 #include <string>
 #include <mciapi.h>
-struct Position
-{
-    int x, y, z;
-    bool operator==(const Position& other) const
-    {
-        return x == other.x && y == other.y && z == other.z;
-    }
-};
+#include "vector2.h"
 
+class Grid
+{
+public:
+	static const int cellSize = 40;
+
+	static int toPixelX(int row) 
+	{
+		return row * cellSize;
+	}
+
+	static int toPixelY(int col)
+	{
+		return col * cellSize;
+	}
+
+	static int getTileSize()
+	{
+		return cellSize;
+	}
+
+	static Vector2 get_image_pos(Vector2 pos)
+	{
+		return { pos.x * cellSize, pos.y * cellSize };
+	}
+
+	static Vector2 fromPixel(int x, int y)
+	{
+		return { (float)x / cellSize, (float)y / cellSize };
+	}
+
+
+};
 
 
 struct Rect

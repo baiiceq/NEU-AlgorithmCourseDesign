@@ -36,13 +36,20 @@ public:
 
     int getRows() const;
     int getCols() const;
-    bool isWalkable(int x, int y) const;
     bool isFog() const;
 
     void generate();  // 分治生成本层
-    void print() const;
+    void on_render();
 
     const std::vector<std::vector<TileType>>& getGrid() const { return grid; }
+
+    bool isWalkable(int x, int y) const
+    {
+		if (grid[x][y] != TileType::Wall)
+			return true;
+
+        return false;
+    }
 
 };
 
@@ -52,22 +59,14 @@ class Maze
 public:
     Maze(int l, int r, int c);
 
-    void generate();                      // 多层分治生成
-    void placeStairs();                   // 添加楼梯连接层
-    void placeStartAndExit();             // 放置起点终点
-    void placeElements(TileType type, int count);
+    void generate(int layer);             // 多层分治生成
 
-    TileType getTile(Position pos) const;
-    void setTile(Position pos, TileType type);
+	void on_render(int layer);     
 
-    bool isWalkable(Position pos) const;
-    int getLayers() const;
-    int getRows() const;
-    int getCols() const;
-    const Position& getStart() const;
-    const Position& getExit() const;
-
-	void print() const;                   // 打印整个迷宫
+	const MazeLayer& get_layer(int layer) const
+	{
+		return maze[layer];
+	}
 private:
     int layers, rows, cols;
     std::vector<MazeLayer> maze;

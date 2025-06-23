@@ -10,6 +10,8 @@ MazeLayer::MazeLayer(int rows, int cols, bool isFog) : rows(rows), cols(cols), i
 
 void MazeLayer::divide(int x, int y, int width, int height)
 {
+	on_render();
+	Sleep(80);
 	if (width <= 1 || height <= 1) return;
 
 	// 优先从较大的一边分割
@@ -27,7 +29,7 @@ void MazeLayer::divide(int x, int y, int width, int height)
 		do_vertical = (prefer_vertical && can_vertical) || (!can_horizontal && can_vertical);
 	}
 
-	const int MAX_RETRY = 30;
+	const int MAX_RETRY = 10;
 
 	if (!can_vertical && !can_horizontal) return;
 
@@ -126,9 +128,6 @@ void MazeLayer::divide(int x, int y, int width, int height)
 		divide(x, y, width, wall_y - y);                      // 上区域
 		divide(x, wall_y + 1, width, y + height - wall_y - 1); // 下区域
 	}
-
-
-
 }
 
 TileType MazeLayer::getTile(int x, int y) const
@@ -151,11 +150,6 @@ int MazeLayer::getCols() const
 	return cols;
 }
 
-bool MazeLayer::isWalkable(int y, int x) const
-{
-	return grid[x][y] == TileType::Path;
-
-}
 
 bool MazeLayer::isFog() const
 {
@@ -167,28 +161,39 @@ void MazeLayer::generate()
 	divide(0, 0, cols, rows);
 }
 
-void MazeLayer::print() const
+void MazeLayer::on_render()
 {
-	for (const auto& row : grid) 
+	int TILE_SIZE = Grid::getTileSize();
+	for (int i = 0; i < rows; i++)
 	{
-		for (const auto& tile : row) 
+		for (int j = 0; j < cols; j++)
 		{
-			switch (tile) 
+			if (grid[i][j] == TileType::Wall)
 			{
-			case TileType::Path:
-				std::cout << ".";
-				break;
-			case TileType::Wall:
-				std::cout << "#";
-				break;
-			case TileType::Trap:
-				std::cout << "T";
-				break;
-			default:
-				std::cout << "O";
-				break;
+				Rect rect = { Grid::toPixelX(i), Grid::toPixelY(j), TILE_SIZE, TILE_SIZE};
+				putimage_alpha(ResourcesManager::instance()->find_image("wall"), &rect);
+			}
+			else
+			{
+				Rect rect = { Grid::toPixelX(i), Grid::toPixelY(j), TILE_SIZE, TILE_SIZE };
+				putimage_alpha(ResourcesManager::instance()->find_image("floor"), &rect);
 			}
 		}
-		std::cout << std::endl;
 	}
 }
+
+Maze::Maze(int l, int r, int c) :layers(l), rows(r), cols(c)
+{
+	maze.resize(layers, MazeLayer(rows, cols));
+}
+
+void Maze::generate(int layer)
+{
+	maze[layer].generate();
+}
+
+void Maze::on_render(int layer)
+{
+	maze[layer].on_render();
+}
+

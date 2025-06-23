@@ -22,6 +22,12 @@ static const std::vector<ImageResInfo> image_info_list =
 	{"wall",                   _T(R"(resources\wall.png)")},
 };
 
+static const std::vector<AtlasResInfo> atlas_info_list =
+{
+	{"player_run_right",             _T(R"(resources\player\run\%d.png)") ,     6},
+	{"player_idle_right",            _T(R"(resources\player\idle\%d.png)") ,    4},
+};
+
 static inline bool check_image_valid(IMAGE* image)
 {
 	return GetImageBuffer(image);
@@ -39,6 +45,23 @@ void ResourcesManager::load()
 			throw info.path;
 		image_pool[info.id] = image;
 	}
+
+	for (const auto& info : atlas_info_list)
+	{
+		Atlas* atlas = new Atlas();
+		atlas->load_from_file(info.path, info.num_frame);
+		for (int i = 0; i < info.num_frame; i++)
+		{
+			IMAGE* image = atlas->get_image(i);
+			if (!check_image_valid(image))
+				throw info.path;
+		}
+
+		atlas_pool[info.id] = atlas;
+	}
+
+	flip_atlas("player_run_right", "player_run_left");
+	flip_atlas("player_idle_right", "player_idle_left");
 
 }
 

@@ -149,8 +149,10 @@
     <ClInclude Include="player.h" />
     <ClInclude Include="Puzzle.h" />
     <ClInclude Include="random.h" />
+    <ClInclude Include="timer.h" />
     <ClInclude Include="trap.h" />
     <ClInclude Include="util.h" />
+    <ClInclude Include="vector2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
