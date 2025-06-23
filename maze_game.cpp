@@ -14,6 +14,7 @@ void MazeGame::on_update(int delta)
 	if (state == start)
 	{
 		player.on_update(delta);
+		maze.on_update(delta, now_layer);
 	}
 }
 

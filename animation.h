@@ -117,9 +117,9 @@ public:
 		const Frame& frame = frame_list[idx_frame];
 
 		Rect rect_dst;
-		rect_dst.x = (int)position.x - frame.rect_src.w / 2;
+		rect_dst.x = (int)position.x - (frame.rect_src.w * magnification_factor) / 2;
 		rect_dst.y = (anchor_mode == AnchorMode::Centered)
-			? (int)position.y - frame.rect_src.h / 2 : (int)position.y - frame.rect_src.h;
+			? (int)position.y - (frame.rect_src.h * magnification_factor) / 2 : (int)position.y - (frame.rect_src.h * magnification_factor);
 		rect_dst.w = frame.rect_src.w * magnification_factor, rect_dst.h = frame.rect_src.h * magnification_factor;
 
 		putimage_alpha(frame.image, &rect_dst, &frame.rect_src);

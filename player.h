@@ -54,6 +54,6 @@ private:
 	const int RUN_TIME = 500; // 移动一格的时间 
     Timer timer_move;
 
-    const int OFFESET_X = 70;
-    const int OFFESET_Y = 130;
+    const int OFFESET_X = 21;
+    const int OFFESET_Y = 39;
 };

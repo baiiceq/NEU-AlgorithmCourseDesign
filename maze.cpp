@@ -5,7 +5,31 @@
 
 MazeLayer::MazeLayer(int rows, int cols, bool isFog) : rows(rows), cols(cols), isFogLayer(isFog)
 {
-	grid.resize(rows, std::vector<Tile>(cols, Tile(TileType::Empty)));
+	grid.resize(rows, std::vector<Tile*>(cols, new Tile()));
+
+	Tile* shared = grid[0][0]; 
+	delete shared;
+
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			grid[i][j] = new Tile();
+			grid[i][j]->set_pos({ (float)i, (float)j });
+		}
+	}
+
+}
+
+MazeLayer::~MazeLayer()
+{
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			delete grid[i][j];
+		}
+	}
 }
 
 void MazeLayer::divide(int x, int y, int width, int height)
@@ -48,7 +72,7 @@ void MazeLayer::divide(int x, int y, int width, int height)
 			bool has_door = false;
 			for (int i = max(0, y - 1); i < min(y + height + 1, cols) ; i++)
 			{
-				if (grid[i][wall_x].get_type() == TileType::DOOR)
+				if (grid[i][wall_x]->get_type() == TileType::DOOR)
 				{
 					has_door = true;
 					break;
@@ -69,10 +93,10 @@ void MazeLayer::divide(int x, int y, int width, int height)
 		{
 			if (i == door_y)
 			{
-				grid[i][wall_x] = TileType::DOOR;
+				grid[i][wall_x]->set_type(TileType::DOOR);
 				continue;
 			}
-			grid[i][wall_x] = TileType::Wall;
+			grid[i][wall_x]->set_type(TileType::Wall);
 		}
 		 
 		// µÝ¹é×óÓÒÇøÓò
@@ -96,7 +120,7 @@ void MazeLayer::divide(int x, int y, int width, int height)
 			bool has_door = false;
 			for (int i = max(0, x - 1); i < min(x + width + 1, rows); i++) 
 			{
-				if (grid[wall_y][i].get_type() == TileType::DOOR)
+				if (grid[wall_y][i]->get_type() == TileType::DOOR)
 				{
 					has_door = true;
 					break;
@@ -118,10 +142,10 @@ void MazeLayer::divide(int x, int y, int width, int height)
 		{
 			if (i == door_x)
 			{
-				grid[wall_y][i] = TileType::DOOR;
+				grid[wall_y][i]->set_type(TileType::DOOR);
 				continue;
 			}
-			grid[wall_y][i] = TileType::Wall;
+			grid[wall_y][i]->set_type(TileType::Wall);
 		}
 
 		// µÝ¹éÉÏÏÂÇøÓò
@@ -149,32 +173,39 @@ bool MazeLayer::isFog() const
 void MazeLayer::generate()
 {
 	divide(0, 0, cols, rows);
+
+	delete grid[19][19];
+	grid[19][19] = new Gold();
+	grid[19][19]->set_pos({ 19.0f, 19.0f });
 }
 
 void MazeLayer::on_render()
 {
-	int TILE_SIZE = Grid::getTileSize();
 	for (int i = 0; i < rows; i++)
 	{
 		for (int j = 0; j < cols; j++)
 		{
-			if (grid[i][j].get_type() == TileType::Wall)
-			{
-				Rect rect = { Grid::toPixelX(i), Grid::toPixelY(j), TILE_SIZE, TILE_SIZE};
-				putimage_alpha(ResourcesManager::instance()->find_image("wall"), &rect);
-			}
-			else
-			{
-				Rect rect = { Grid::toPixelX(i), Grid::toPixelY(j), TILE_SIZE, TILE_SIZE };
-				putimage_alpha(ResourcesManager::instance()->find_image("floor"), &rect);
-			}
+			grid[i][j]->on_render();
+		}
+	}
+}
+
+void MazeLayer::on_update(int delta)
+{
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			grid[i][j]->on_update(delta);
 		}
 	}
 }
 
 Maze::Maze(int l, int r, int c) :layers(l), rows(r), cols(c)
 {
-	maze.resize(layers, MazeLayer(rows, cols));
+	maze.reserve(layers);
+	for (int i = 0; i < layers; ++i)
+		maze.emplace_back(rows, cols);
 }
 
 void Maze::generate(int layer)
@@ -185,5 +216,10 @@ void Maze::generate(int layer)
 void Maze::on_render(int layer)
 {
 	maze[layer].on_render();
+}
+
+void Maze::on_update(int delta, int layer)
+{
+	maze[layer].on_update(delta);
 }
 
