@@ -14,13 +14,14 @@ class Player
 public:
     Player(Vector2 start = {0, 0}, int hp = 100, int initResource = 0);
 
-    void on_input(const ExMessage& msg, const MazeLayer& ml);
+    void on_input(const ExMessage& msg);
 
-	void on_update(int delta);
 
-	void on_render();
+    void on_update(int delta, const MazeLayer& ml);
 
-    void move_to(Vector2 pos, const MazeLayer& ml);
+    void on_render();
+
+    bool move_to(Vector2 pos, const MazeLayer& ml);
 
 	void set_position(Vector2 pos);
     Vector2 getPosition() const;
@@ -39,6 +40,7 @@ public:
 private:
     Vector2 pos;
     Vector2 image_pos;
+    Vector2 last_image_pos;
     int resource;
     int health;
     int maxHealth;
@@ -58,7 +60,7 @@ private:
     bool is_running_up = false;
     bool is_running_down = false;
 
-	const int RUN_TIME = 500; // 移动一格的时间 
+	const int RUN_TIME = 300; // 移动一格的时间 
     Timer timer_move;
 
     const int OFFESET_X = 21;

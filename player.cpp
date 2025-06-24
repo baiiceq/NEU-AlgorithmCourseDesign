@@ -6,7 +6,6 @@ Player::Player(Vector2 start, int hp, int initResource)
 	timer_move.set_wait_time(RUN_TIME);
 	timer_move.set_on_timeout([&]()
 		{
-			is_idle = true;
 			image_pos = Grid::get_image_pos(pos);
 		});
 
@@ -37,33 +36,26 @@ Player::Player(Vector2 start, int hp, int initResource)
 	pos = start;
 }
 
-void Player::on_input(const ExMessage& msg, const MazeLayer& ml)
+void Player::on_input(const ExMessage& msg)
 {
-	if (!is_idle)
-		return;
-
 	if (msg.message == WM_KEYDOWN)
 	{
 		switch (msg.vkcode)
 		{
 		case VK_LEFT:
 		case 0x41:
-			move_to(pos + Vector2(-1, 0), ml);
 			is_running_left = true;
 			break;
 		case VK_RIGHT:
 		case 0x44:
-			move_to(pos + Vector2(1, 0), ml);
 			is_running_right = true;
 			break;
 		case VK_UP:
 		case 0x57:
-			move_to(pos + Vector2(0, -1), ml);
 			is_running_up = true;
 			break;
 		case VK_DOWN:
 		case 0x53:
-			move_to(pos + Vector2(0, 1), ml);
 			is_running_down = true;
 			break;
 		default:
@@ -96,29 +88,8 @@ void Player::on_input(const ExMessage& msg, const MazeLayer& ml)
 	}
 }
 
-void Player::on_update(int delta)
+void Player::on_update(int delta, const MazeLayer& ml)
 {
-	Vector2 target_image_pos = Grid::get_image_pos(pos);
-
-	if (!(image_pos == target_image_pos))
-	{
-		timer_move.on_update(delta);
-		is_idle = false;
-		if (image_pos.x <= Grid::get_image_pos(pos).x)
-			is_facing_right = true;
-		else
-			is_facing_right = false;
-
-		float t = timer_move.get_ratio();
-		image_pos = image_pos + (target_image_pos - image_pos) * t;
-
-	}
-	else
-	{
-		is_idle = true;
-	}
-
-
 	if (is_idle)
 	{
 		if (is_facing_right)
@@ -140,6 +111,50 @@ void Player::on_update(int delta)
 		{
 			anim_run_left.on_update(delta);
 		}
+	}
+
+	Vector2 target_image_pos = Grid::get_image_pos(pos);
+
+	if (!(image_pos == target_image_pos))
+	{
+		timer_move.on_update(delta);
+		is_idle = false;
+
+		float t = timer_move.get_ratio();
+		image_pos = last_image_pos + (target_image_pos - last_image_pos) * t;
+
+	}
+	else
+	{
+		if (is_running_right)
+		{
+			is_facing_right = true;
+			if (move_to(pos + Vector2(1, 0), ml))
+				return;
+		}
+
+		if (is_running_left)
+		{
+			is_facing_right = false;
+			if (move_to(pos + Vector2(-1, 0), ml))
+				return;
+
+		}
+
+		if (is_running_up)
+		{
+			if (move_to(pos + Vector2(0, -1), ml))
+				return;
+		}
+
+		if (is_running_down)
+		{
+			if (move_to(pos + Vector2(0, 1), ml))
+				return;
+		}
+
+		is_idle = true;
+
 	}
 }
 
@@ -173,13 +188,22 @@ void Player::on_render()
 	}
 }
 
-void Player::move_to(Vector2 pos, const MazeLayer& ml)
+bool Player::move_to(Vector2 pos, const MazeLayer& ml)
 {
+	if (pos.x < 0 || pos.x >= ml.getCols() || pos.y < 0 || pos.y >= ml.getRows())
+	{
+		return false; // Ô½½ç
+	}
+
 	if (ml.isWalkable(pos.x, pos.y))
 	{
+		last_image_pos = image_pos;
 		this->pos = pos; 
 		timer_move.restart();
+		return true;
 	}
+
+	return false;
 }
 
 void Player::set_position(Vector2 pos)

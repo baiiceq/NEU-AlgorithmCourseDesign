@@ -13,7 +13,7 @@ void MazeGame::on_update(int delta)
 {
 	if (state == start)
 	{
-		player.on_update(delta);
+		player.on_update(delta, maze.get_layer(now_layer));
 		maze.on_update(delta, now_layer);
 	}
 }
@@ -31,6 +31,6 @@ void MazeGame::on_input(const ExMessage& msg)
 {
 	if (state == start)
 	{
-		player.on_input(msg, maze.get_layer(now_layer));
+		player.on_input(msg);
 	}
 }

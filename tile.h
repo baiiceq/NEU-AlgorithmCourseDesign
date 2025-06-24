@@ -32,6 +32,8 @@ public:
 
     virtual void on_update(int delta);
 
+    virtual void on_enter(const Player& player);
+
     bool is_walkable() const
     {
         return type != TileType::Wall;

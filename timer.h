@@ -59,6 +59,8 @@ public:
 
 	float get_ratio() const 
 	{
+		if (one_shot && shotted)
+			return 1.0f;
 		return wait_time == 0 ? 1.0f : (((1.0f) < (pass_time / (float)wait_time)) ? (1.0f) : (pass_time / (float)wait_time));
 	}
 	int get_pass_time() const 
