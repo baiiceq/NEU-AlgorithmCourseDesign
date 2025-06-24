@@ -1,5 +1,4 @@
 #pragma once
-#include "maze.h"
 #include <string>
 #include <functional>
 #include "boss.h"
@@ -9,6 +8,8 @@
 #include "animation.h"
 #include <graphics.h>
 
+class MazeLayer;
+
 class Player
 {
 public:
@@ -17,17 +18,24 @@ public:
     void on_input(const ExMessage& msg);
 
 
-    void on_update(int delta, const MazeLayer& ml);
+    void on_update(int delta, MazeLayer& ml);
 
     void on_render();
 
-    bool move_to(Vector2 pos, const MazeLayer& ml);
+    bool move_to(Vector2 pos, MazeLayer& ml);
 
 	void set_position(Vector2 pos);
     Vector2 getPosition() const;
 
-    int getResource() const;
-    void addResource(int val);
+    int get_resource() const
+    {
+		return resource;
+    }
+    void add_resource(int val)
+    {
+        resource += val;
+        resource = max(0, resource);
+    }
 
     int getHealth() const;
     void addHealth(int val);

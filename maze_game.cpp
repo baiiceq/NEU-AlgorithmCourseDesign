@@ -24,6 +24,14 @@ void MazeGame::on_render()
 	{
 		maze.on_render(now_layer);
 		player.on_render();
+
+		settextstyle(30, 15, L"微软雅黑");
+		std::wstring text = L"当前层数: " + std::to_wstring(now_layer + 1) + L" / " + std::to_wstring(layers);
+		outtextxy(rows * 40 + 20, 20, text.c_str());
+
+		text = L"金币: " + std::to_wstring(player.get_resource());
+		outtextxy(rows * 40 + 20, 60, text.c_str());
+
 	}
 }
 

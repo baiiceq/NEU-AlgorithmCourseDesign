@@ -1,4 +1,5 @@
 #include "player.h"
+#include "maze.h"
 
 Player::Player(Vector2 start, int hp, int initResource)
 {
@@ -88,7 +89,7 @@ void Player::on_input(const ExMessage& msg)
 	}
 }
 
-void Player::on_update(int delta, const MazeLayer& ml)
+void Player::on_update(int delta, MazeLayer& ml)
 {
 	if (is_idle)
 	{
@@ -188,7 +189,7 @@ void Player::on_render()
 	}
 }
 
-bool Player::move_to(Vector2 pos, const MazeLayer& ml)
+bool Player::move_to(Vector2 pos, MazeLayer& ml)
 {
 	if (pos.x < 0 || pos.x >= ml.getCols() || pos.y < 0 || pos.y >= ml.getRows())
 	{
@@ -200,6 +201,7 @@ bool Player::move_to(Vector2 pos, const MazeLayer& ml)
 		last_image_pos = image_pos;
 		this->pos = pos; 
 		timer_move.restart();
+		ml.get_tile(pos.x, pos.y)->on_enter(*this);
 		return true;
 	}
 

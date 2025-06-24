@@ -7,7 +7,7 @@
 
 int main()
 {
-	HWND hwnd = initgraph(800, 800, EW_SHOWCONSOLE);
+	HWND hwnd = initgraph(800 + 400, 800, EW_SHOWCONSOLE);
 
 	try
 	{

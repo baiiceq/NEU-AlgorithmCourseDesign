@@ -33,11 +33,11 @@ Gold::Gold(int value) : Tile(TileType::Gold), value(value)
 
 void Gold::on_render()
 {
+	Tile::on_render();
+
 	if (is_triggered)
 		return;
 	
-	Tile::on_render();
-
 	anim_gold.set_position(Grid::get_image_pos(pos) + Vector2(OFFSET_X, OFFSET_Y));
 	anim_gold.on_render(0.05);
 }
@@ -48,6 +48,12 @@ void Gold::on_update(int delta)
 		return;
 
 	anim_gold.on_update(delta);
+}
+
+void Gold::on_enter(Player& player)
+{
+	player.add_resource(value);
+	is_triggered = true;
 }
 
 Trap::Trap(int damage) : Tile(TileType::Trap), damage(damage)
@@ -72,6 +78,11 @@ void Trap::on_update(int delta)
 	anim_trap.on_update(delta);
 }
 
+void Trap::on_enter(Player& player)
+{
+	player.add_resource(-damage);
+}
+
 void Start::on_render()
 {
 	Tile::on_render();
@@ -86,4 +97,9 @@ void End::on_render()
 	const int TILE_SIZE = Grid::cellSize;
 	Rect rect = { Grid::toPixelX(pos.x), Grid::toPixelY(pos.y), TILE_SIZE, TILE_SIZE };
 	putimage_alpha(ResourcesManager::instance()->find_image("exit"), &rect);
+}
+
+void End::on_enter(Player& player)
+{
+
 }

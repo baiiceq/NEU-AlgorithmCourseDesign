@@ -1,8 +1,6 @@
 #include "maze.h"
 #include <iostream>
 
-
-
 MazeLayer::MazeLayer(int rows, int cols) : rows(rows), cols(cols)
 {
 	grid.resize(rows, std::vector<Tile*>(cols, new Tile()));

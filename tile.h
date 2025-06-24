@@ -1,5 +1,6 @@
 #pragma once
 #include "animation.h"
+#include "player.h"
 
 enum class TileType
 {
@@ -32,7 +33,7 @@ public:
 
     virtual void on_update(int delta);
 
-    virtual void on_enter(const Player& player);
+    virtual void on_enter(Player& player) {}
 
     bool is_walkable() const
     {
@@ -57,6 +58,7 @@ public:
 
     void on_render() override;
     void on_update(int delta) override;
+	void on_enter(Player& player) override;
 
 private:
 	int value;  // 金币的价值
@@ -78,6 +80,8 @@ public:
 
     void on_render() override;
     void on_update(int delta) override;
+    void on_enter(Player& player) override;
+
 
 private:
 	int damage;  // 陷阱造成的伤害
@@ -106,6 +110,7 @@ public:
     End() : Tile(TileType::End) {}
 
     void on_render() override;
+    void on_enter(Player& player) override;
 
 private:
     const int OFFSET_X = 20;

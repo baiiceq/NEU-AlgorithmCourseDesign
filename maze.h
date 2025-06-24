@@ -9,7 +9,7 @@ class MazeLayer
 {
 private:
     int rows, cols;
-    std::vector<std::vector<Tile*>> grid;
+    std::vector<std::vector<Tile*> > grid;
 
     Vector2 end_pos;
     Vector2 start_pos;
@@ -68,7 +68,7 @@ public:
 
     void on_update(int delta, int layer);
 
-	const MazeLayer& get_layer(int layer) const
+	MazeLayer& get_layer(int layer)
 	{
 		return maze[layer];
 	}
