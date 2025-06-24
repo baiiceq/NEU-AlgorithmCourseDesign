@@ -7,7 +7,7 @@
 
 int main()
 {
-	HWND hwnd = initgraph(800 + 400, 800, EW_SHOWCONSOLE);
+	HWND hwnd = initgraph(400 + 200, 400, EW_SHOWCONSOLE);
 
 	try
 	{
@@ -28,7 +28,7 @@ int main()
 
 	bool running = true;
 
-	MazeGame game(3, 20, 20);
+	MazeGame game(3, 10, 10);
 
 	BeginBatchDraw();
 

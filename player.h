@@ -25,7 +25,10 @@ public:
     bool move_to(Vector2 pos, MazeLayer& ml);
 
 	void set_position(Vector2 pos);
-    Vector2 getPosition() const;
+    Vector2 get_pos() const
+    {
+        return pos;
+    }
 
     int get_resource() const
     {
@@ -36,6 +39,16 @@ public:
         resource += val;
         resource = max(0, resource);
     }
+
+    bool get_is_exit() const
+    {
+		return is_exit;
+    }
+
+	void set_is_exit(bool exit)
+	{
+		is_exit = exit;
+	}
 
     int getHealth() const;
     void addHealth(int val);
@@ -68,7 +81,9 @@ private:
     bool is_running_up = false;
     bool is_running_down = false;
 
-	const int RUN_TIME = 300; // 移动一格的时间 
+    bool is_exit = false;
+
+	const int RUN_TIME = 150; // 移动一格的时间 
     Timer timer_move;
 
     const int OFFESET_X = 21;

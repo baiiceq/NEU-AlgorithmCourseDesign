@@ -59,6 +59,9 @@ void Player::on_input(const ExMessage& msg)
 		case 0x53:
 			is_running_down = true;
 			break;
+		case VK_RETURN:
+			is_exit = true; 
+			break;
 		default:
 			break;
 		}
@@ -82,6 +85,9 @@ void Player::on_input(const ExMessage& msg)
 		case VK_DOWN:
 		case 0x53:
 			is_running_down = false;
+			break;
+		case VK_RETURN:
+			is_exit = false;
 			break;
 		default:
 			break;

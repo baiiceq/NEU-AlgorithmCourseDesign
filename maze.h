@@ -54,6 +54,10 @@ public:
 	const std::vector<Vector2>& get_gold_pos() const { return gold_pos; }
 
 	const std::vector<Vector2>& get_trap_pos() const { return trap_pos; }
+
+    std::vector<std::vector<TileType> > get_simple_grid() const;
+
+    std::vector<std::vector<int> > get_resource_grid() const;
 };
 
 

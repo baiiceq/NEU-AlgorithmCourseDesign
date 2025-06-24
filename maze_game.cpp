@@ -15,6 +15,12 @@ void MazeGame::on_update(int delta)
 	{
 		player.on_update(delta, maze.get_layer(now_layer));
 		maze.on_update(delta, now_layer);
+
+		if (player.get_pos() == maze.get_end_pos(now_layer) && player.get_is_exit())
+		{
+			maze.generate(++now_layer);
+			player.set_position(maze.get_start_pos(now_layer));
+		}
 	}
 }
 
@@ -25,7 +31,7 @@ void MazeGame::on_render()
 		maze.on_render(now_layer);
 		player.on_render();
 
-		settextstyle(30, 15, L"Î¢ÈíÑÅºÚ");
+		settextstyle(26, 15, L"Î¢ÈíÑÅºÚ");
 		std::wstring text = L"µ±Ç°²ãÊý: " + std::to_wstring(now_layer + 1) + L" / " + std::to_wstring(layers);
 		outtextxy(rows * 40 + 20, 20, text.c_str());
 

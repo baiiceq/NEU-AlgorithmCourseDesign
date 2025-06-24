@@ -32,7 +32,10 @@ MazeLayer::~MazeLayer()
 
 void MazeLayer::divide(int x, int y, int width, int height)
 {
+	BeginBatchDraw();
+	cleardevice();
 	on_render();
+	FlushBatchDraw();
 	Sleep(80);
 	if (width <= 1 || height <= 1) return;
 
@@ -266,12 +269,18 @@ void MazeLayer::generate()
 	divide(0, 0, cols, rows);
 	generate_entry_and_exit();
 
+	BeginBatchDraw();
+	cleardevice();
 	on_render();
+	FlushBatchDraw();
 	Sleep(150);
 
 	generate_gold_and_trap();
 
+	BeginBatchDraw();
+	cleardevice();
 	on_render();
+	FlushBatchDraw();
 	Sleep(150);
 }
 
@@ -295,6 +304,38 @@ void MazeLayer::on_update(int delta)
 			grid[i][j]->on_update(delta);
 		}
 	}
+}
+
+std::vector<std::vector<TileType> > MazeLayer::get_simple_grid() const
+{
+	std::vector<std::vector<TileType> > simple_grid(rows, std::vector<TileType>(cols, TileType::Empty));
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			simple_grid[i][j] = grid[i][j]->get_type();
+		}
+	}
+
+	return simple_grid;
+}
+
+std::vector<std::vector<int> > MazeLayer::get_resource_grid() const
+{
+	std::vector<std::vector<int> > resource_grid(rows, std::vector<int>(cols, -1)); 
+
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			if (grid[i][j]->get_type() == TileType::Gold)
+				resource_grid[i][j] = static_cast<Gold*>(grid[i][j])->get_value();
+			else if (grid[i][j]->get_type() == TileType::Trap)
+				resource_grid[i][j] = -static_cast<Trap*>(grid[i][j])->get_damage();
+		}
+	}
+
+	return resource_grid;
 }
 
 Maze::Maze(int l, int r, int c) :layers(l), rows(r), cols(c)

@@ -45,6 +45,9 @@
     <ClCompile Include="tile.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="optimal_path.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="maze.h">
@@ -87,6 +90,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="tile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="optimal_path.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
