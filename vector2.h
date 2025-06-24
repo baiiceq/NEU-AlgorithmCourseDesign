@@ -18,6 +18,8 @@ public:
 	Vector2(const Vector2& v)
 		:x(v.x), y(v.y) {}
 
+
+
 	Vector2 operator+(const Vector2& vec) const
 	{
 		return Vector2(x + vec.x, y + vec.y);
@@ -26,6 +28,11 @@ public:
 	Vector2 operator-(const Vector2& vec) const
 	{
 		return Vector2(x - vec.x, y - vec.y);
+	}
+
+	bool operator<(const Vector2& vec) const
+	{
+		return x < vec.x;
 	}
 
 	float operator*(const Vector2& vec) const

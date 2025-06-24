@@ -3,6 +3,7 @@
 #include "player.h"
 #include "random.h"
 #include "boss.h"
+#include "optimal_path.h"
 #include "util.h"
 #include <string>
 #include <graphics.h>
@@ -13,7 +14,8 @@ private:
 	enum GameState
 	{
 		generate,
-		start
+		start,
+		ai
 	};
 
 public:
@@ -31,6 +33,8 @@ private:
     Maze maze;
     Player player;
 	GameState state;
+
+	std::vector<Vector2> path_with_no_resource; // 不考虑资源的路径
 
 	int layers;
 	int rows;

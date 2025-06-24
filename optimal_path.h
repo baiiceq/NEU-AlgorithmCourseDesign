@@ -19,7 +19,7 @@ private:
         }
     };
 
-    int heuristic(const Vector2& a, const Vector2& b) 
+    static int heuristic(const Vector2& a, const Vector2& b) 
     {
         return abs(a.x - b.x) + abs(a.y - b.y); // Âü¹ş¶Ù¾àÀë
     }

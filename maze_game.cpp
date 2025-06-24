@@ -11,7 +11,7 @@ MazeGame::MazeGame(int layers, int rows, int cols) : maze(layers, rows, cols),la
 
 void MazeGame::on_update(int delta)
 {
-	if (state == start)
+	if (state != generate)
 	{
 		player.on_update(delta, maze.get_layer(now_layer));
 		maze.on_update(delta, now_layer);
@@ -26,7 +26,7 @@ void MazeGame::on_update(int delta)
 
 void MazeGame::on_render()
 {
-	if (state == start)
+	if (state != generate)
 	{
 		maze.on_render(now_layer);
 		player.on_render();
@@ -43,6 +43,16 @@ void MazeGame::on_render()
 
 void MazeGame::on_input(const ExMessage& msg)
 {
+	if (msg.message == WM_KEYDOWN && msg.vkcode == 0x51)
+	{
+		state = ai;
+		path_with_no_resource = OptimalPath::calculate(player.get_pos(), maze.get_end_pos(now_layer), maze.get_resource_grid(now_layer), maze.get_simple_grid(now_layer));
+		for (auto& pos : path_with_no_resource)
+		{
+			std::cout << pos.x << " " << pos.y << std::endl;
+		}
+	}
+		
 	if (state == start)
 	{
 		player.on_input(msg);

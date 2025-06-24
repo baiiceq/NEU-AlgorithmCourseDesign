@@ -81,6 +81,17 @@ public:
 
     Vector2 get_end_pos(int layer) { return maze[layer].get_end_pos(); }
 
+	std::vector<std::vector<TileType> > get_simple_grid(int layer) const
+	{
+		return maze[layer].get_simple_grid();
+	}
+
+	std::vector<std::vector<int> > get_resource_grid(int layer) const
+	{
+		return maze[layer].get_resource_grid();
+	}
+
+
 private:
     int layers, rows, cols;
     std::vector<MazeLayer> maze;
