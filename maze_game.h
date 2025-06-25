@@ -35,11 +35,14 @@ private:
 	GameState state;
 
 	std::vector<Vector2> path_with_no_resource; // 不考虑资源的路径
+	int path_with_no_resource_idx = 0;
 
 	int layers;
 	int rows;
 	int cols;
 
 	int now_layer = 0; // 当前层数
+
+	bool is_show_resource = false;
 };
 

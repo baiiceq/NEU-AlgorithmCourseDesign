@@ -7,7 +7,7 @@
 
 int main()
 {
-	HWND hwnd = initgraph(400 + 200, 400, EW_SHOWCONSOLE);
+	HWND hwnd = initgraph(800 + 400, 800, EW_SHOWCONSOLE);
 
 	try
 	{
@@ -21,14 +21,14 @@ int main()
 		return -1;
 	}
 
-	Random::init();
+	Random::init(114514);
 
 	ExMessage msg;
 	const int FPS = 60;
 
 	bool running = true;
 
-	MazeGame game(3, 10, 10);
+	MazeGame game(3, 20, 20);
 
 	BeginBatchDraw();
 

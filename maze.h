@@ -37,7 +37,7 @@ public:
 
     void generate();  // 分治生成本层
 
-    void on_render();
+    void on_render(bool is_show_resource);
     void on_update(int delta);
 
     const std::vector<std::vector<Tile*>>& getGrid() const { return grid; }
@@ -58,6 +58,8 @@ public:
     std::vector<std::vector<TileType> > get_simple_grid() const;
 
     std::vector<std::vector<int> > get_resource_grid() const;
+
+    std::vector<Vector2> get_coins_pos() const;
 };
 
 
@@ -68,7 +70,7 @@ public:
 
     void generate(int layer);             // 多层分治生成
 
-    void on_render(int layer);
+    void on_render(int layer, bool is_show_resource);
 
     void on_update(int delta, int layer);
 
@@ -91,6 +93,10 @@ public:
 		return maze[layer].get_resource_grid();
 	}
 
+	std::vector<Vector2> get_coins_pos(int layer) const
+	{
+		return maze[layer].get_coins_pos();
+	}
 
 private:
     int layers, rows, cols;

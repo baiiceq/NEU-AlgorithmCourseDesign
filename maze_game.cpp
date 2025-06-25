@@ -22,21 +22,44 @@ void MazeGame::on_update(int delta)
 			player.set_position(maze.get_start_pos(now_layer));
 		}
 	}
+
+	if (state == ai)
+	{
+		if (path_with_no_resource_idx < path_with_no_resource.size())
+		{
+			if (player.move_to(path_with_no_resource[path_with_no_resource_idx], maze.get_layer(now_layer)))
+			{
+				std::cout << path_with_no_resource[path_with_no_resource_idx].x << " " << path_with_no_resource[path_with_no_resource_idx].y << std::endl;
+				path_with_no_resource_idx++;
+			}
+		}
+	}
 }
 
 void MazeGame::on_render()
 {
 	if (state != generate)
 	{
-		maze.on_render(now_layer);
+		maze.on_render(now_layer, is_show_resource);
 		player.on_render();
 
-		settextstyle(26, 15, L"微软雅黑");
+		settextstyle(37, 15, L"微软雅黑");
 		std::wstring text = L"当前层数: " + std::to_wstring(now_layer + 1) + L" / " + std::to_wstring(layers);
 		outtextxy(rows * 40 + 20, 20, text.c_str());
 
 		text = L"金币: " + std::to_wstring(player.get_resource());
-		outtextxy(rows * 40 + 20, 60, text.c_str());
+		outtextxy(rows * 40 + 20, 80, text.c_str());
+
+		if (is_show_resource)
+		{
+			text = L"当前打开数值显示，按E关闭";
+			outtextxy(rows * 40 + 20, 140, text.c_str());
+		}
+		else
+		{
+			text = L"当前关闭数值显示，按E打开";
+			outtextxy(rows * 40 + 20, 140, text.c_str());
+		}
 
 	}
 }
@@ -46,11 +69,12 @@ void MazeGame::on_input(const ExMessage& msg)
 	if (msg.message == WM_KEYDOWN && msg.vkcode == 0x51)
 	{
 		state = ai;
-		path_with_no_resource = OptimalPath::calculate(player.get_pos(), maze.get_end_pos(now_layer), maze.get_resource_grid(now_layer), maze.get_simple_grid(now_layer));
-		for (auto& pos : path_with_no_resource)
-		{
-			std::cout << pos.x << " " << pos.y << std::endl;
-		}
+		auto ans = OptimalPath::find_best_path(player.get_pos(), maze.get_end_pos(now_layer), maze.get_coins_pos(now_layer), maze.get_simple_grid(now_layer), maze.get_resource_grid(now_layer));
+		path_with_no_resource = ans.path;
+	}
+	else if (msg.message == WM_KEYDOWN && msg.vkcode == 0x45)
+	{
+		is_show_resource = !is_show_resource;
 	}
 		
 	if (state == start)

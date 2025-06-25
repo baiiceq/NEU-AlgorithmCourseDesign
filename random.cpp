@@ -1,10 +1,12 @@
 #include "random.h"
+#include <iostream>
 
 std::mt19937 Random::rng; // 静态成员定义
 
 void Random::init(unsigned int seed)
 {
     rng.seed(seed);
+	std::cout << "种子为" << seed << std::endl;
 }
 
 int Random::randint(int low, int high) 

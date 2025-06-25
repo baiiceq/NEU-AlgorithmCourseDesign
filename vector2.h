@@ -32,8 +32,18 @@ public:
 
 	bool operator<(const Vector2& vec) const
 	{
-		return x < vec.x;
+		if (std::abs(x - vec.x) > 1e-6) 
+		{ 
+			return x < vec.x;
+		}
+
+		if (std::abs(y - vec.y) > 1e-6)
+		{
+			return y < vec.y;
+		}
+		return false;
 	}
+
 
 	float operator*(const Vector2& vec) const
 	{
@@ -52,7 +62,7 @@ public:
 
 	bool operator==(const Vector2& vec)
 	{
-		return (x == vec.x) && (y == vec.y);
+		return std::fabs(x - vec.x) < 1e-6 && std::fabs(y - vec.y) < 1e-6;
 	}
 
 	void operator-=(const Vector2& vec)
@@ -80,3 +90,4 @@ public:
 		return Vector2(x / len, y / len);
 	}
 };
+

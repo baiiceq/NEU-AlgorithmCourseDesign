@@ -16,7 +16,6 @@ MazeLayer::MazeLayer(int rows, int cols) : rows(rows), cols(cols)
 			grid[i][j]->set_pos({ (float)i, (float)j });
 		}
 	}
-
 }
 
 MazeLayer::~MazeLayer()
@@ -34,7 +33,7 @@ void MazeLayer::divide(int x, int y, int width, int height)
 {
 	BeginBatchDraw();
 	cleardevice();
-	on_render();
+	on_render(false);
 	FlushBatchDraw();
 	Sleep(80);
 	if (width <= 1 || height <= 1) return;
@@ -231,20 +230,20 @@ void MazeLayer::generate_gold_and_trap()
 			}
 
 			// 从这一小块中随机挑一个位置
-			if (!empty_cells.empty() && Random::chance(0.3)) // 30% 的块可能生成资源
+			if (!empty_cells.empty() && Random::chance(0.25)) // 25% 的块可能生成资源
 			{
 				Vector2 pos = Random::choice(empty_cells);
 
 				if (Random::chance(0.6))  // 60% 概率金币 / 40% 陷阱
 				{
 					delete grid[pos.x][pos.y];
-					grid[pos.x][pos.y] = new Gold(Random::randint(5, 10));
+					grid[pos.x][pos.y] = new Gold(Random::randint(50, 100));
 					grid[pos.x][pos.y]->set_pos(pos);
 				}
 				else
 				{
 					delete grid[pos.x][pos.y];
-					grid[pos.x][pos.y] = new Trap(Random::randint(5, 10));
+					grid[pos.x][pos.y] = new Trap(Random::randint(40, 80));
 					grid[pos.x][pos.y]->set_pos(pos);
 				}
 			}
@@ -271,7 +270,7 @@ void MazeLayer::generate()
 
 	BeginBatchDraw();
 	cleardevice();
-	on_render();
+	on_render(false);
 	FlushBatchDraw();
 	Sleep(150);
 
@@ -279,18 +278,18 @@ void MazeLayer::generate()
 
 	BeginBatchDraw();
 	cleardevice();
-	on_render();
+	on_render(false);
 	FlushBatchDraw();
 	Sleep(150);
 }
 
-void MazeLayer::on_render()
+void MazeLayer::on_render(bool is_show_resource)
 {
 	for (int i = 0; i < rows; i++)
 	{
 		for (int j = 0; j < cols; j++)
 		{
-			grid[i][j]->on_render();
+			grid[i][j]->on_render(is_show_resource);
 		}
 	}
 }
@@ -338,6 +337,24 @@ std::vector<std::vector<int> > MazeLayer::get_resource_grid() const
 	return resource_grid;
 }
 
+std::vector<Vector2> MazeLayer::get_coins_pos() const
+{
+	// 返回所有金币的位置
+	std::vector<Vector2> coins_pos;
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			if (grid[i][j]->get_type() == TileType::Gold)
+			{
+				coins_pos.emplace_back(i, j);
+			}
+		}
+	}
+
+	return coins_pos;
+}
+
 Maze::Maze(int l, int r, int c) :layers(l), rows(r), cols(c)
 {
 	maze.reserve(layers);
@@ -350,9 +367,9 @@ void Maze::generate(int layer)
 	maze[layer].generate();
 }
 
-void Maze::on_render(int layer)
+void Maze::on_render(int layer, bool is_show_resource)
 {
-	maze[layer].on_render();
+	maze[layer].on_render(is_show_resource);
 }
 
 void Maze::on_update(int delta, int layer)

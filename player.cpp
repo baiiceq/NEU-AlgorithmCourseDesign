@@ -1,7 +1,7 @@
 #include "player.h"
 #include "maze.h"
 
-Player::Player(Vector2 start, int hp, int initResource)
+Player::Player(Vector2 start, int hp, int init_resource)
 {
 	timer_move.set_one_shot(true);
 	timer_move.set_wait_time(RUN_TIME);
@@ -35,6 +35,7 @@ Player::Player(Vector2 start, int hp, int initResource)
 	anim_run_right.set_interval(120);
 
 	pos = start;
+	resource = init_resource;
 }
 
 void Player::on_input(const ExMessage& msg)
@@ -201,6 +202,9 @@ bool Player::move_to(Vector2 pos, MazeLayer& ml)
 	{
 		return false; // Ô½½ç
 	}
+
+	if (!is_idle && !(is_running_down || is_running_left || is_running_right || is_running_up))
+		return false;
 
 	if (ml.isWalkable(pos.x, pos.y))
 	{

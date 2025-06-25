@@ -29,11 +29,11 @@ public:
         this->pos = pos;
     }
 
-    virtual void on_render();
+    virtual void on_render(bool is_show_resource);
 
     virtual void on_update(int delta);
 
-    virtual void on_enter(Player& player) {}
+    virtual void on_enter(Player& player);
 
     bool is_walkable() const
     {
@@ -56,7 +56,7 @@ public:
 
 	void set_triggered(bool triggered) { is_triggered = triggered; }
 
-    void on_render() override;
+    void on_render(bool is_show_resource) override;
     void on_update(int delta) override;
 	void on_enter(Player& player) override;
 
@@ -78,7 +78,7 @@ public:
 	int get_damage() const { return damage; }
 	void set_damage(int new_damage) { damage = new_damage; }
 
-    void on_render() override;
+    void on_render(bool is_show_resource) override;
     void on_update(int delta) override;
     void on_enter(Player& player) override;
 
@@ -97,7 +97,7 @@ class Start : public Tile
 public:
 	Start() : Tile(TileType::Start) {}
 
-    void on_render() override;
+    void on_render(bool is_show_resource) override;
 
 private:
 	const int OFFSET_X = 20;
@@ -109,7 +109,7 @@ class End : public Tile
 public:
     End() : Tile(TileType::End) {}
 
-    void on_render() override;
+    void on_render(bool is_show_resource) override;
     void on_enter(Player& player) override;
 
 private:

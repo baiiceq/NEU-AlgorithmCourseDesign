@@ -9,11 +9,13 @@ bool GreedyPick::in_bounds(Vector2 p, MazeLayer mazelayer)
 {
 	return p.x >= 0 && p.x < mazelayer.getRows() && p.y >= 0 && p.y < mazelayer.getCols();
 }
+
 GreedyPick::GreedyPick(Vector2 start,int start_layer)
 {
 	pos = start;
 	layer = start_layer;
 }
+
 void GreedyPick::PickGoldLayer(MazeLayer mazelayer)
 {
 	std::set<Vector2> is_Pick;

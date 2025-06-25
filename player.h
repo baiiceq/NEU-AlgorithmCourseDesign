@@ -13,7 +13,7 @@ class MazeLayer;
 class Player
 {
 public:
-    Player(Vector2 start = {0, 0}, int hp = 100, int initResource = 0);
+    Player(Vector2 start = {0, 0}, int hp = 100, int init_resource = 100);
 
     void on_input(const ExMessage& msg);
 
