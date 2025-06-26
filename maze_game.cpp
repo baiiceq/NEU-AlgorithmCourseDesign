@@ -31,6 +31,11 @@ MazeGame::MazeGame()
 	ai_selector.set_size({ 120, 40 });
 	ai_selector.set_options({ L"真人", L"AI" });
 
+	ai_mode_selector.set_position({ 2 * left_x, top_y + 5 * gap_y });
+	ai_mode_selector.set_size({ 120, 40 });
+	ai_mode_selector.set_options({ L"动态规划最优解", L"3x3贪心" });
+
+
 	start_button.set_text(L"开始游戏");
 	start_button.set_pos(right_x, top_y + 5 * gap_y);
 	start_button.set_size(120, 50);
@@ -55,6 +60,7 @@ MazeGame::MazeGame()
 		{
 			is_ai = true;
 			state = Ai;
+			ai_mode = ai_mode_selector.GetSelected();
 		}
 		else
 		{
@@ -116,6 +122,44 @@ void MazeGame::on_update(int delta)
 		}
 		break;
 	case Ai:
+		if (!is_maze_generate) // 如果迷宫还没有生成，则生成迷宫
+		{
+			maze.generate(now_layer);
+			player.set_position(maze.get_start_pos(now_layer));
+			is_maze_generate = true;
+		}
+		player.on_update(delta,maze.get_layer(now_layer));
+		maze.on_update(delta, now_layer);
+
+		if (ai_path.empty())
+		{
+			switch (ai_mode)
+			{
+			case 0:
+			{
+				auto paths = OptimalPath::find_best_path(maze.get_start_pos(now_layer), maze.get_end_pos(now_layer), maze.get_coins_pos(now_layer), maze.get_simple_grid(now_layer), maze.get_resource_grid(now_layer));
+				ai_path = paths.path;
+				break;
+			}
+			case 1:
+			{
+				gp.PickGoldLayer(maze.get_layer(now_layer));
+				ai_path = gp.getPath(0);
+			}
+			default:
+				break;
+			}
+		}
+		else
+		{
+			if (ai_path_idx < ai_path.size())
+			{
+				if (player.move_to(ai_path[ai_path_idx], maze.get_layer(now_layer)))
+				{
+					ai_path_idx++;
+				}
+			}
+		}
 		break;
 	case Locker:
 		password_input.on_update(delta);
@@ -160,6 +204,11 @@ void MazeGame::on_render()
 		outtextxy(40, 290, L"列数");
 		outtextxy(40, 370, L"层数");
 		outtextxy(40, 450, L"游玩类型");
+		if (ai_selector.GetSelectedText() == L"AI")
+		{
+			outtextxy(40, 530, L"AI策略");
+			ai_mode_selector.on_render();
+		}
 		exit_button.on_render();
 		start_button.on_render();
 		seed_input.on_render();
@@ -172,6 +221,11 @@ void MazeGame::on_render()
 	case Ai:
 	{
 		maze.on_render(now_layer, is_show_resource);
+		for (auto pos : ai_path)
+		{
+			Rect rect = { pos.x * Grid::getTileSize(), pos.y * Grid::getTileSize(), 40, 40 };
+			putimage_alpha(ResourcesManager::instance()->find_image("right_path"), &rect);
+		}
 		player.on_render();
 
 		settextstyle(37, 15, L"微软雅黑");
@@ -242,6 +296,10 @@ void MazeGame::on_input(const ExMessage& msg)
 		col_selector.on_input(msg);
 		layer_selector.on_input(msg);
 		ai_selector.on_input(msg);
+		if (ai_selector.GetSelectedText() == L"AI")
+		{
+			ai_mode_selector.on_input(msg);
+		}
 		break;
 	case Gamer:
 		if (msg.message == WM_KEYDOWN && msg.vkcode == 0x45)

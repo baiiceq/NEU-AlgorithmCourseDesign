@@ -22,7 +22,6 @@ public:
 
     // 所有尝试的密码列表
     const std::vector<std::string>& getAttemptedPasswords() const;
-
 private:
     std::string targetHash_;
     std::vector<std::vector<int>> clues_;

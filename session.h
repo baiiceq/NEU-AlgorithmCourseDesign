@@ -12,6 +12,8 @@ public:
     // 构造函数
     CrackingSession() = default;
 
+    std::string getTargetHash() const;
+
     // 运行整个破译会话的主方法
     void run();
 

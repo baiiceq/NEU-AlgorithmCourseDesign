@@ -8,6 +8,9 @@
 #include "optimal_path.h"
 #include "button.h"
 #include "util.h"
+#include "session.h"
+#include "password.h"
+#include "Greedy.h"
 #include <string>
 #include <graphics.h>
 
@@ -63,8 +66,19 @@ private:
 	OptionSelector col_selector;
 	OptionSelector layer_selector;
 	OptionSelector ai_selector;
+	OptionSelector ai_mode_selector;
 
 	TextInput password_input;
 	Button enter_button;
+
+	GreedyPick gp;
+
+	int ai_mode;
+	std::vector<Vector2> ai_path;
+	int ai_path_idx;
+	
+private:
+	PasswordCracker* pc = nullptr;
+	CrackingSession cs;
 };
 

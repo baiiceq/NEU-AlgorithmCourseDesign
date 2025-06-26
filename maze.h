@@ -15,6 +15,7 @@ private:
     Vector2 start_pos;
     std::vector<Vector2> gold_pos;
     std::vector<Vector2> trap_pos;
+    Vector2 locker_pos;
 
     void divide(int left, int top, int right, int bottom);
 
@@ -53,7 +54,9 @@ public:
 
 	Vector2 get_start_pos() { return start_pos; }
 
-	Vector2 get_end_pos() { return end_pos; }
+    Vector2 get_end_pos() { return end_pos; }
+
+    Vector2 get_locker_pos() { return locker_pos; }
 
 	const std::vector<Vector2>& get_gold_pos() const { return gold_pos; }
 
@@ -103,6 +106,11 @@ public:
 	{
 		return maze[layer].get_coins_pos();
 	}
+
+    Vector2 get_locker_pos(int layer)
+    {
+        return maze[layer].get_locker_pos();
+    }
 
 private:
     int layers, rows, cols;
