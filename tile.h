@@ -127,6 +127,8 @@ public:
 
     std::vector<std::vector<int> > get_clue() { return clue; }
 
+    int get_password() { return password; }
+
 private:
     std::vector<std::vector<int> > clue;
     int password;

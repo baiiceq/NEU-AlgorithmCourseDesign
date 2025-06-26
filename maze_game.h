@@ -13,6 +13,9 @@
 #include "Greedy.h"
 #include <string>
 #include <graphics.h>
+#include <sstream>
+#include <iomanip>
+#include <codecvt>
 
 class MazeGame
 {
@@ -36,7 +39,20 @@ public:
 
 	void on_input(const ExMessage& msg);
 
-	
+private:
+	std::string to_three_digit_string(int num) 
+	{
+		std::ostringstream oss;
+		oss << std::setw(3) << std::setfill('0') << num;
+		return oss.str();
+	}
+
+	std::wstring string_to_wstring(const std::string& str) 
+	{
+		std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+		return converter.from_bytes(str);
+	}
+
 
 private:
     Maze maze;
@@ -80,5 +96,6 @@ private:
 private:
 	PasswordCracker* pc = nullptr;
 	CrackingSession cs;
+	int password;
 };
 

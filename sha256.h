@@ -1,5 +1,4 @@
-﻿#pragma once
-// sha256.h
+﻿// sha256.h
 #ifndef SHA256_H
 #define SHA256_H
 

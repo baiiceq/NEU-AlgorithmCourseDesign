@@ -1,5 +1,6 @@
 #include "maze_game.h"
 #include <graphics.h>
+#include "sha256.h"
 
 MazeGame::MazeGame()
 {
@@ -80,13 +81,13 @@ MazeGame::MazeGame()
 		exit(0);
 	});
 
-	password_input.set_pos(20, 80);
-	password_input.set_size(240, 40);
+	password_input.set_pos(80, 60);
+	password_input.set_size(640, 60);
 	password_input.set_text_when_blank(L"ÇëÊäÈëÃÜÂë");
 	password_input.set_maxlen(3);
 
-	enter_button.set_pos(280, 80);
-	enter_button.set_size(80, 40);
+	enter_button.set_pos(760, 60);
+	enter_button.set_size(120, 60);
 	enter_button.set_text(L"È·ÈÏ");
 }
 
@@ -118,7 +119,8 @@ void MazeGame::on_update(int delta)
 		if (player.get_is_locker())
 		{
 			state = Locker;
-			initgraph(400, 300);
+			password = maze.get_password(now_layer);
+			initgraph(1080, 720);
 		}
 		break;
 	case Ai:
@@ -249,13 +251,16 @@ void MazeGame::on_render()
 	}
 	case Locker:
 	{
-		settextstyle(37, 15, L"Î¢ÈíÑÅºÚ");
+		settextstyle(30, 12, L"Î¢ÈíÑÅºÚ");
 
-		std::wstring text = L"½ğ±Ò: " + std::to_wstring(player.get_resource());
-		outtextxy(20, 180, text.c_str());
+		std::wstring text = L"µ±Ç°½ğ±Ò: " + std::to_wstring(player.get_resource());
+		outtextxy(20, 160, text.c_str());
+		text = L"ÃÜÂë¹şÏ£Öµ£º" + string_to_wstring(sha256::hash_string(to_three_digit_string(password)));
+		outtextxy(20, 200, text.c_str());
 		password_input.on_render();
 		enter_button.on_render();
-		break;
+
+		
 	}
 	}
 	/*if (state != generate)

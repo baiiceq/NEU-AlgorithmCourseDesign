@@ -1,9 +1,8 @@
-﻿#pragma once
-// session.h
+﻿// session.h
 #ifndef SESSION_H
 #define SESSION_H
 
-#include "password.h" // 需要使用 PasswordCracker
+#include "password.h"
 #include <string>
 #include <vector>
 
@@ -12,29 +11,29 @@ public:
     // 构造函数
     CrackingSession() = default;
 
+    // 运行整个破译会话的主方法，接收一个目标密码
+    void run(const std::string& target_password);
+
+
+    // 获取由用户密码生成的SHA-256哈希值
+    // 声明为 const 是因为此函数不会修改类的任何成员变量
     std::string getTargetHash() const;
 
-    // 运行整个破译会话的主方法
-    void run();
+    void set_clue(std::vector<std::vector<int>> clue)
+    {
+        clues_ = clue;
+    }
 
 private:
     // --- 私有成员变量 ---
     std::string originalPassword_;
-    std::string targetHash_;
     std::vector<std::vector<int>> clues_;
 
     // --- 私有辅助方法 ---
-    // 提示用户输入原密码并生成哈希
-    void setupTargetPassword();
-
-    // 提示用户输入所有线索
+    // 接收一个密码并进行设置
+    void setupTargetPassword(const std::string& password_to_set);
     void gatherClues();
-
-    // 执行破译并显示结果
     void executeAndReport();
-
-    // 辅助函数，用于解析形如 "[-1,5,-1]" 的线索字符串
-    // 从旧的 main.cpp 移入此类，设为 static 因为它不依赖于对象状态
     static std::vector<int> parseClue(const std::string& line);
 };
 

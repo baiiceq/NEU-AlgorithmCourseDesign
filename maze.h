@@ -62,6 +62,18 @@ public:
 
 	const std::vector<Vector2>& get_trap_pos() const { return trap_pos; }
 
+    int get_password()
+    {
+        Locker* locker = static_cast<Locker*>(grid[locker_pos.x][locker_pos.y]);
+        return locker->get_password();
+    }
+
+    std::vector<std::vector<int> > get_clue()
+    {
+        Locker* locker = static_cast<Locker*>(grid[locker_pos.x][locker_pos.y]);
+        return locker->get_clue();
+    }
+
     std::vector<std::vector<TileType> > get_simple_grid() const;
 
     std::vector<std::vector<int> > get_resource_grid() const;
@@ -112,6 +124,15 @@ public:
         return maze[layer].get_locker_pos();
     }
 
+    int get_password(int layer)
+    {
+        return maze[layer].get_password();
+    }
+
+    std::vector<std::vector<int> > get_clue(int layer)
+    {
+        return maze[layer].get_clue();
+    }
 private:
     int layers, rows, cols;
     std::vector<MazeLayer> maze;

@@ -8,41 +8,39 @@
 #include <cctype>    // 用于 ::isdigit
 
 // 主运行方法，协调整个流程
-void CrackingSession::run() {
-    setupTargetPassword();
-    gatherClues();
+void CrackingSession::run(const std::string& target_password) {
+    setupTargetPassword(target_password);
+    //gatherClues();
     executeAndReport();
 }
 
-// 实现 getTargetHash 函数，它只返回私有成员 targetHash_ 的值。
+// 实现 getTargetHash 函数，它动态计算并返回原密码的哈希值。
 std::string CrackingSession::getTargetHash() const {
-    return targetHash_;
+    // 如果 originalPassword_ 为空 (例如，如果 setup 失败), 则返回空哈希
+    if (originalPassword_.empty()) {
+        return "";
+    }
+    return sha256::hash_string(originalPassword_);
 }
 
-// 步骤 1: 接收原密码并生成目标哈希值
-void CrackingSession::setupTargetPassword() {
-    while (true) {
-        std::cout << "请输入一个三位数字的原密码: ";
-        std::cin >> originalPassword_;
-        // 验证输入是否为三位数字
-        if (originalPassword_.length() == 3 && std::all_of(originalPassword_.begin(), originalPassword_.end(), ::isdigit)) {
-            break; // 输入有效，跳出循环
-        }
-        else {
-            std::cerr << "输入无效，密码必须是三位数字。请重新输入。\n";
-            // 清理错误的输入流状态并忽略缓冲区中的剩余内容
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-        }
+// 步骤 1: 接收一个密码参数并设置目标哈希值
+void CrackingSession::setupTargetPassword(const std::string& password_to_set) {
+    // 验证传入的密码是否为三位数字
+    if (password_to_set.length() == 3 && std::all_of(password_to_set.begin(), password_to_set.end(), ::isdigit)) {
+        originalPassword_ = password_to_set; // 输入有效，设置密码
+    }
+    else {
+        // 由于没有交互，如果密码无效，则打印错误并终止程序
+        std::cerr << "错误: 提供的密码 \"" << password_to_set << "\" 无效。密码必须是三位数字。程序将退出。\n";
+        exit(1);
     }
 
-    // 使用 sha256.h 中的函数计算并显示哈希值
-    targetHash_ = sha256::hash_string(originalPassword_);
-    std::cout << "\n原密码 '" << originalPassword_ << "' 的SHA-256哈希值为:\n" << targetHash_ << std::endl;
+    // 使用 getTargetHash() 函数计算并显示哈希值
+    std::cout << "原密码 '" << originalPassword_ << "' 的SHA-256哈希值为:\n" << getTargetHash() << std::endl;
     std::cout << "----------------------------------------------------------------\n" << std::endl;
 }
 
-// 步骤 2: 接收破译线索
+// 步骤 2: 接收破译线索 (此部分保持不变，仍然是交互式)
 void CrackingSession::gatherClues() {
     int x;
     std::cout << "请输入线索数量 (0-3，输入0代表无任何线索): ";
@@ -79,8 +77,8 @@ void CrackingSession::gatherClues() {
 
 // 步骤 3 & 4: 创建破译器、执行破译并显示结果
 void CrackingSession::executeAndReport() {
-    // 使用我们自己生成的哈希值创建破译器实例
-    PasswordCracker cracker(targetHash_);
+    // 使用 getTargetHash() 获取哈希值来创建破译器实例
+    PasswordCracker cracker(getTargetHash());
 
     // 添加所有线索
     for (const auto& clue : clues_) {
