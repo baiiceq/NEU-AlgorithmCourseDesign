@@ -116,3 +116,23 @@ private:
     const int OFFSET_X = 20;
     const int OFFSET_Y = 36;
 };
+
+class Locker : public Tile
+{
+public:
+    Locker();
+
+    void on_render(bool is_show_resource) override;
+    void on_enter(Player& player) override;
+
+    std::vector<std::vector<int> > get_clue() { return clue; }
+
+private:
+    std::vector<std::vector<int> > clue;
+    int password;
+
+    void generate_clue();
+private:
+    const int OFFSET_X = 20;
+    const int OFFSET_Y = 36;
+};

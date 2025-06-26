@@ -50,6 +50,15 @@ public:
 		is_exit = exit;
 	}
 
+    void set_is_locker(bool b)
+    {
+        is_locker = b;
+    }
+
+	bool get_is_locker() const
+	{
+		return is_locker;
+	}
     int getHealth() const;
     void addHealth(int val);
     void reduceHealth(int val);
@@ -82,10 +91,12 @@ private:
     bool is_running_down = false;
 
     bool is_exit = false;
+    bool is_locker = false;
 
 	const int RUN_TIME = 150; // 移动一格的时间 
     Timer timer_move;
 
     const int OFFESET_X = 21;
     const int OFFESET_Y = 39;
+
 };

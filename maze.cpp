@@ -1,5 +1,6 @@
 #include "maze.h"
 #include <iostream>
+#include "optimal_path.h"
 
 MazeLayer::MazeLayer(int rows, int cols) : rows(rows), cols(cols)
 {
@@ -35,7 +36,7 @@ void MazeLayer::divide(int x, int y, int width, int height)
 	cleardevice();
 	on_render(false);
 	FlushBatchDraw();
-	Sleep(80);
+	Sleep(30);
 	if (width <= 1 || height <= 1) return;
 
 	// 优先从较大的一边分割
@@ -251,6 +252,29 @@ void MazeLayer::generate_gold_and_trap()
 	}
 }
 
+void MazeLayer::generate_lock()
+{
+	std::vector<Vector2> doors;
+	
+	auto path = OptimalPath::find_direct_path(start_pos, end_pos, this->get_resource_grid(), this->get_simple_grid());
+	for (auto pos : path.path)
+	{
+		if (grid[pos.x][pos.y]->get_type() == TileType::DOOR)
+		{
+			doors.push_back(pos);
+		}
+	}
+
+	if (doors.empty()) return;
+
+	std::shuffle(doors.begin(), doors.end(), Random::get_rng());
+	auto locker_pos = doors[0]; 
+
+	delete grid[locker_pos.x][locker_pos.y];
+	grid[locker_pos.x][locker_pos.y] = new Locker();
+	grid[locker_pos.x][locker_pos.y]->set_pos(locker_pos);
+}
+
 void MazeLayer::reset(int row, int col)
 {
 	for (int i = 0; i < rows; i++)
@@ -300,7 +324,7 @@ void MazeLayer::generate()
 	Sleep(150);
 
 	generate_gold_and_trap();
-
+	generate_lock();
 	BeginBatchDraw();
 	cleardevice();
 	on_render(false);

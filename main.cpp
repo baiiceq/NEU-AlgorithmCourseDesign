@@ -9,22 +9,17 @@
 
 int main()
 {
-<<<<<<< HEAD
 	// 禁用 C4996 警告 (针对 Visual Studio 中的某些标准库函数)
-#ifdef _MSC_VER
-#define _CRT_SECURE_NO_WARNINGS
-#endif
+	#ifdef _MSC_VER
+	#define _CRT_SECURE_NO_WARNINGS
+	#endif
 
 	// 创建一个会话对象
 	CrackingSession session;
 
 	// 运行整个应用程序逻辑
 	session.run();
-
-	HWND hwnd = initgraph(800 + 400, 800, EW_SHOWCONSOLE);
-=======
 	HWND hwnd = initgraph(800, 600, EW_SHOWCONSOLE);
->>>>>>> c8bd27a96ab53b9a31b92b2bdd3e0db8ffa3c24c
 
 	try
 	{

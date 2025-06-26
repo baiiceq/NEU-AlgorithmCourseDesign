@@ -19,7 +19,9 @@ private:
 		Init,
 		Generate,
 		Gamer,
-		Ai
+		Ai,
+		Locker,
+		Boss
 	};
 
 public:

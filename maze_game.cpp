@@ -99,8 +99,16 @@ void MazeGame::on_update(int delta)
 			maze.generate(++now_layer);
 			player.set_position(maze.get_start_pos(now_layer));
 		}
+
+		if (player.get_is_locker())
+		{
+			state = Locker;
+		}
 		break;
 	case Ai:
+		break;
+	case Locker:
+		
 		break;
 	}
 
