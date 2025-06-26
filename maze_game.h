@@ -1,9 +1,12 @@
 #pragma once
 #include "maze.h"
+#include "text_input.h"
+#include "option_selector.h"
 #include "player.h"
 #include "random.h"
 #include "boss.h"
 #include "optimal_path.h"
+#include "button.h"
 #include "util.h"
 #include <string>
 #include <graphics.h>
@@ -13,13 +16,14 @@ class MazeGame
 private:
 	enum GameState
 	{
-		generate,
-		start,
-		ai
+		Init,
+		Generate,
+		Gamer,
+		Ai
 	};
 
 public:
-    MazeGame(int layers, int rows, int cols);
+    MazeGame();
     
 	void on_update(int delta);
 
@@ -44,5 +48,18 @@ private:
 	int now_layer = 0; // µ±Ç°²ãÊý
 
 	bool is_show_resource = false;
+	bool is_ai = false;
+	bool is_maze_generate = false;
+
+	unsigned int seed;
+
+private:
+	Button start_button;
+	Button exit_button;
+	TextInput seed_input;
+	OptionSelector row_selector;
+	OptionSelector col_selector;
+	OptionSelector layer_selector;
+	OptionSelector ai_selector;
 };
 

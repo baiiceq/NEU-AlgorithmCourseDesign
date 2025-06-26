@@ -70,7 +70,7 @@ void MazeLayer::divide(int x, int y, int width, int height)
 			wall_x = x + Random::randint(1, width - 2);
 
 			bool has_door = false;
-			for (int i = max(0, y - 1); i < min(y + height + 1, cols) ; i++)
+			for (int i = max(0, y - 1); i < min(y + height + 1, rows) ; i++)
 			{
 				if (grid[i][wall_x]->get_type() == TileType::DOOR)
 				{
@@ -118,7 +118,7 @@ void MazeLayer::divide(int x, int y, int width, int height)
 			wall_y = y + Random::randint(1, height - 2);
 
 			bool has_door = false;
-			for (int i = max(0, x - 1); i < min(x + width + 1, rows); i++) 
+			for (int i = max(0, x - 1); i < min(x + width + 1, cols); i++) 
 			{
 				if (grid[wall_y][i]->get_type() == TileType::DOOR)
 				{
@@ -251,6 +251,31 @@ void MazeLayer::generate_gold_and_trap()
 	}
 }
 
+void MazeLayer::reset(int row, int col)
+{
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			delete grid[i][j];
+		}
+	}
+
+	rows = row;
+	cols = col;
+	grid.resize(rows, std::vector<Tile*>(cols, new Tile()));
+	Tile* shared = grid[0][0];
+	delete shared;
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			grid[i][j] = new Tile();
+			grid[i][j]->set_pos({ (float)i, (float)j });
+		}
+	}
+}
+
 int MazeLayer::getRows() const
 {
 	return rows;
@@ -375,5 +400,20 @@ void Maze::on_render(int layer, bool is_show_resource)
 void Maze::on_update(int delta, int layer)
 {
 	maze[layer].on_update(delta);
+}
+
+void Maze::reset(int layer, int row, int col)
+{
+	layers = layer;
+	rows = row;
+	cols = col;
+
+	maze.clear();
+	maze.reserve(layers);
+	for (int i = 0; i < layers; ++i)
+	{
+		maze.emplace_back(rows, cols);
+	}
+
 }
 

@@ -20,7 +20,9 @@ private:
 
     void generate_entry_and_exit();
 
-	void generate_gold_and_trap();
+    void generate_gold_and_trap();
+
+    void generate_lock();
 
 public:
     MazeLayer(int rows, int cols);
@@ -31,6 +33,8 @@ public:
     {
         return grid[x][y];
     }
+
+    void reset(int row, int col);
 
     int getRows() const;
     int getCols() const;
@@ -66,13 +70,15 @@ public:
 class Maze  
 {
 public:
-    Maze(int l, int r, int c);
+    Maze(int l = 2, int r = 7, int c = 7);
 
     void generate(int layer);             // 多层分治生成
 
     void on_render(int layer, bool is_show_resource);
 
     void on_update(int delta, int layer);
+
+    void reset(int layer, int row, int col);
 
 	MazeLayer& get_layer(int layer)
 	{

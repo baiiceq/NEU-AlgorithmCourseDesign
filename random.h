@@ -10,7 +10,7 @@ class Random
 {
 public:
     // 初始化随机种子（建议在 main 中调用一次）
-    static void init(unsigned int seed = std::random_device{}());
+    static unsigned int init(unsigned int seed = std::random_device{}());
 
     static int randint(int low, int high);
     static double randfloat(double low, double high);

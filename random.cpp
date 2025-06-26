@@ -3,10 +3,10 @@
 
 std::mt19937 Random::rng; // 静态成员定义
 
-void Random::init(unsigned int seed)
+unsigned int Random::init(unsigned int seed)
 {
     rng.seed(seed);
-	std::cout << "种子为" << seed << std::endl;
+    return seed;
 }
 
 int Random::randint(int low, int high) 
