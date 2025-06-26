@@ -14,6 +14,11 @@ void CrackingSession::run() {
     executeAndReport();
 }
 
+// 实现 getTargetHash 函数，它只返回私有成员 targetHash_ 的值。
+std::string CrackingSession::getTargetHash() const {
+    return targetHash_;
+}
+
 // 步骤 1: 接收原密码并生成目标哈希值
 void CrackingSession::setupTargetPassword() {
     while (true) {
