@@ -1,13 +1,30 @@
-#include <iostream>
+﻿#include <iostream>
 #include <graphics.h>
 #include "random.h"
 #include "maze.h"
 #include "maze_game.h"
+#include "session.h" 
+
 
 
 int main()
 {
+<<<<<<< HEAD
+	// 禁用 C4996 警告 (针对 Visual Studio 中的某些标准库函数)
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
+	// 创建一个会话对象
+	CrackingSession session;
+
+	// 运行整个应用程序逻辑
+	session.run();
+
+	HWND hwnd = initgraph(800 + 400, 800, EW_SHOWCONSOLE);
+=======
 	HWND hwnd = initgraph(800, 600, EW_SHOWCONSOLE);
+>>>>>>> c8bd27a96ab53b9a31b92b2bdd3e0db8ffa3c24c
 
 	try
 	{
@@ -16,8 +33,8 @@ int main()
 	catch (const LPCTSTR id)
 	{
 		TCHAR err_msg[512];
-		_stprintf_s(err_msg, _T("�޷����أ�%s"), id);
-		MessageBox(hwnd, err_msg, _T("��Դ����ʧ��"), MB_OK | MB_ICONERROR);
+		_stprintf_s(err_msg, _T("无法加载：%s"), id);
+		MessageBox(hwnd, err_msg, _T("资源加载失败"), MB_OK | MB_ICONERROR);
 		return -1;
 	}
 
