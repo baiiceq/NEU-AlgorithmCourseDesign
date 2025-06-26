@@ -63,5 +63,8 @@ private:
 	OptionSelector col_selector;
 	OptionSelector layer_selector;
 	OptionSelector ai_selector;
+
+	TextInput password_input;
+	Button enter_button;
 };
 

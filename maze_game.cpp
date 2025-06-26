@@ -73,6 +73,15 @@ MazeGame::MazeGame()
 	{
 		exit(0);
 	});
+
+	password_input.set_pos(20, 80);
+	password_input.set_size(240, 40);
+	password_input.set_text_when_blank(L"«Î ‰»Î√‹¬Î");
+	password_input.set_maxlen(3);
+
+	enter_button.set_pos(280, 80);
+	enter_button.set_size(80, 40);
+	enter_button.set_text(L"»∑»œ");
 }
 
 
@@ -103,12 +112,13 @@ void MazeGame::on_update(int delta)
 		if (player.get_is_locker())
 		{
 			state = Locker;
+			initgraph(400, 300);
 		}
 		break;
 	case Ai:
 		break;
 	case Locker:
-		
+		password_input.on_update(delta);
 		break;
 	}
 
@@ -160,6 +170,7 @@ void MazeGame::on_render()
 		break;
 	case Gamer:
 	case Ai:
+	{
 		maze.on_render(now_layer, is_show_resource);
 		player.on_render();
 
@@ -181,6 +192,17 @@ void MazeGame::on_render()
 			outtextxy(rows * 40 + 20, 140, text.c_str());
 		}
 		break;
+	}
+	case Locker:
+	{
+		settextstyle(37, 15, L"Œ¢»Ì—≈∫⁄");
+
+		std::wstring text = L"Ω±“: " + std::to_wstring(player.get_resource());
+		outtextxy(20, 180, text.c_str());
+		password_input.on_render();
+		enter_button.on_render();
+		break;
+	}
 	}
 	/*if (state != generate)
 	{
@@ -234,7 +256,11 @@ void MazeGame::on_input(const ExMessage& msg)
 			is_show_resource = !is_show_resource;
 		}
 		break;
+	case Locker:
+		enter_button.on_input(msg);
+		password_input.on_input(msg);
 	}
+
 	/*if (msg.message == WM_KEYDOWN && msg.vkcode == 0x51)
 	{
 		state = ai;

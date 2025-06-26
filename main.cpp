@@ -14,11 +14,6 @@ int main()
 	#define _CRT_SECURE_NO_WARNINGS
 	#endif
 
-	// 创建一个会话对象
-	CrackingSession session;
-
-	// 运行整个应用程序逻辑
-	session.run();
 	HWND hwnd = initgraph(800, 600, EW_SHOWCONSOLE);
 
 	try
