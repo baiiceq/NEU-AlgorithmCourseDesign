@@ -268,7 +268,7 @@ void MazeLayer::generate_lock()
 	if (doors.empty()) return;
 
 	std::shuffle(doors.begin(), doors.end(), Random::get_rng());
-	auto locker_pos = doors[0]; 
+	locker_pos = doors[0]; 
 
 	delete grid[locker_pos.x][locker_pos.y];
 	grid[locker_pos.x][locker_pos.y] = new Locker();

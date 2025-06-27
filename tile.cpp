@@ -191,4 +191,5 @@ void Locker::generate_clue()
 	{
 		clue.push_back(candidates[i]);
 	}
+
 }

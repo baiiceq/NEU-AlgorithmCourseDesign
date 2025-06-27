@@ -89,6 +89,13 @@ MazeGame::MazeGame()
 	enter_button.set_pos(760, 60);
 	enter_button.set_size(120, 60);
 	enter_button.set_text(L"确认");
+	enter_button.set_on_click([&]
+		{
+			if (password_input.get_text().size() == 3)
+			{
+				try_password = std::stoi(password_input.get_text());
+			}
+		});
 }
 
 
@@ -119,7 +126,9 @@ void MazeGame::on_update(int delta)
 		if (player.get_is_locker())
 		{
 			state = Locker;
+			try_password = -1;
 			password = maze.get_password(now_layer);
+			clue = maze.get_clue(now_layer);
 			initgraph(1080, 720);
 		}
 		break;
@@ -255,12 +264,46 @@ void MazeGame::on_render()
 
 		std::wstring text = L"当前金币: " + std::to_wstring(player.get_resource());
 		outtextxy(20, 160, text.c_str());
-		text = L"密码哈希值：" + string_to_wstring(sha256::hash_string(to_three_digit_string(password)));
+		text = L"目标密码的哈希值：" + string_to_wstring(sha256::hash_string(to_three_digit_string(password)));
 		outtextxy(20, 200, text.c_str());
+		if (try_password != -1)
+		{
+			text = L"尝试密码:" + string_to_wstring(to_three_digit_string(try_password));
+			outtextxy(20, 240, text.c_str());
+			text = L"尝试密码的哈希值:" + string_to_wstring(sha256::hash_string(to_three_digit_string(try_password)));
+			outtextxy(20, 280, text.c_str());
+		}
+
+		for (int i = 0; i < clue.size(); i++)
+		{
+			if (clue[i].size() == 2)
+			{
+				if (clue[i][0] == -1)
+				{
+					text = L"线索" + std::to_wstring(i) + L": 三位都是是素数并且不重复";
+				}
+				else
+				{
+					text = L"线索" + std::to_wstring(i) + L": 第" + std::to_wstring(clue[i][0]) + L"位是" + (clue[i][1] ? L"是奇数" : L"是偶数");
+				}
+			}
+			else
+			{
+				for (int j = 0; j < 3; j++)
+				{
+					if (clue[i][j] != -1)
+					{
+						text = L"线索" + std::to_wstring(i) + L": 第" + std::to_wstring(j + 1) + L"位是" + std::to_wstring(clue[i][j]);
+						break;
+					}
+				}
+			}
+			outtextxy(20, 320 + 40 * i, text.c_str());
+
+		}
+		
 		password_input.on_render();
 		enter_button.on_render();
-
-		
 	}
 	}
 	/*if (state != generate)

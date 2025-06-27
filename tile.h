@@ -125,7 +125,10 @@ public:
     void on_render(bool is_show_resource) override;
     void on_enter(Player& player) override;
 
-    std::vector<std::vector<int> > get_clue() { return clue; }
+    std::vector<std::vector<int> > get_clue() 
+    {
+        return clue; 
+    }
 
     int get_password() { return password; }
 

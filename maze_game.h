@@ -97,5 +97,7 @@ private:
 	PasswordCracker* pc = nullptr;
 	CrackingSession cs;
 	int password;
+	int try_password;
+	std::vector<std::vector<int> > clue;
 };
 
