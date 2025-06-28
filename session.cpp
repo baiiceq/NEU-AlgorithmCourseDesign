@@ -94,7 +94,7 @@ void CrackingSession::executeAndReport() {
     int coinsDeducted = cracker.getDeductedCoins();
 
     // 获取所有有效尝试
-    const auto& attempts = cracker.getAttemptedPasswords();
+    attempts = cracker.getAttemptedPasswords();
 
     std::cout << "----------------------------------------" << std::endl;
 

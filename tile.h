@@ -135,9 +135,23 @@ public:
 private:
     std::vector<std::vector<int> > clue;
     int password;
+    bool is_triggered = false;  // 是否被触发过
 
     void generate_clue();
 private:
     const int OFFSET_X = 20;
     const int OFFSET_Y = 36;
+};
+
+class Boss : public Tile
+{
+public:
+    Boss():Tile(TileType::Boss){}
+
+    void on_render(bool is_show_resource) override;
+    void on_enter(Player& player) override;
+
+private:
+    std::vector<int> hps;
+    bool is_triggered = false;  // 是否被触发过
 };

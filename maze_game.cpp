@@ -36,6 +36,21 @@ MazeGame::MazeGame()
 	ai_mode_selector.set_size({ 120, 40 });
 	ai_mode_selector.set_options({ L"动态规划最优解", L"3x3贪心" });
 
+	count_selector.set_position({6.5f * left_x, top_y + 1 * gap_y });
+	count_selector.set_size({ 120, 40 });
+	count_selector.set_options({ L"1", L"2", L"3", L"4", L"5", L"6", L"7", L"8", L"9", L"10"});
+
+	generate_button.set_text(L"生成");
+	generate_button.set_pos(6.5f * left_x, top_y + 2 * gap_y);
+	generate_button.set_size(120, 50);
+	generate_button.set_on_click([&]()
+		{
+			cols = std::stoi(row_selector.GetSelectedText());
+			rows = std::stoi(col_selector.GetSelectedText());
+			int cnt = std::stoi(count_selector.GetSelectedText());
+			MazeLayer::generate_multiple_mazes(cnt, rows, cols);
+			MessageBox(GetHWnd(), _T("生成成功"), _T("成功"), MB_OK);
+		});
 
 	start_button.set_text(L"开始游戏");
 	start_button.set_pos(right_x, top_y + 5 * gap_y);
@@ -86,6 +101,14 @@ MazeGame::MazeGame()
 	password_input.set_text_when_blank(L"请输入密码");
 	password_input.set_maxlen(3);
 
+	skip_button.set_pos(80, 600);
+	skip_button.set_size(120, 60);
+	skip_button.set_text(L"跳过");
+	skip_button.set_on_click([&]
+		{
+
+		});
+
 	enter_button.set_pos(760, 60);
 	enter_button.set_size(120, 60);
 	enter_button.set_text(L"确认");
@@ -94,6 +117,22 @@ MazeGame::MazeGame()
 			if (password_input.get_text().size() == 3)
 			{
 				try_password = std::stoi(password_input.get_text());
+
+				if (password == try_password)
+				{
+					closegraph();
+					initgraph(max(rows, cols) * Grid::getTileSize() + 300, max(rows, cols) * Grid::getTileSize());
+					state = is_ai ? Ai : Gamer;
+					player.set_is_locker(false);
+					player.run_reset();
+					try_password = -1;
+					password = -1;
+					clue.clear();
+				}
+				else
+				{
+					player.add_resource(-1);
+				}
 			}
 		});
 }
@@ -129,6 +168,7 @@ void MazeGame::on_update(int delta)
 			try_password = -1;
 			password = maze.get_password(now_layer);
 			clue = maze.get_clue(now_layer);
+			closegraph();
 			initgraph(1080, 720);
 		}
 		break;
@@ -139,7 +179,7 @@ void MazeGame::on_update(int delta)
 			player.set_position(maze.get_start_pos(now_layer));
 			is_maze_generate = true;
 		}
-		player.on_update(delta,maze.get_layer(now_layer));
+		player.on_update(delta, maze.get_layer(now_layer));
 		maze.on_update(delta, now_layer);
 
 		if (ai_path.empty())
@@ -171,9 +211,57 @@ void MazeGame::on_update(int delta)
 				}
 			}
 		}
+		if (player.get_is_locker())
+		{
+			state = Locker;
+			try_password = -1;
+			password = maze.get_password(now_layer);
+			clue = maze.get_clue(now_layer);
+			CrackingSession cs;
+			cs.set_clue(clue);
+			cs.run(to_three_digit_string(password));
+			ai_try_passwords.clear();
+			ai_try_passwords = cs.get_attempts();
+			ai_try_password_idx = 0;
+			closegraph();
+			initgraph(1080, 720);
+		}
+
+		if (player.get_pos() == maze.get_end_pos(now_layer) && ai_path_idx == ai_path.size())
+		{
+			maze.generate(++now_layer);
+			player.set_position(maze.get_start_pos(now_layer));
+			ai_path_idx = 0;
+			ai_path.clear();
+		}
 		break;
 	case Locker:
-		password_input.on_update(delta);
+		if(!is_ai)
+			password_input.on_update(delta);
+		else
+		{
+			if (ai_try_password_idx < ai_try_passwords.size())
+			{
+				try_password = std::atoi(ai_try_passwords[ai_try_password_idx].c_str());
+				ai_try_password_idx++;
+				Sleep(50);
+				if (ai_try_password_idx == ai_try_passwords.size())
+				{
+					closegraph();
+					initgraph(max(rows, cols) * Grid::getTileSize() + 300, max(rows, cols) * Grid::getTileSize());
+					state = is_ai ? Ai : Gamer;
+					player.set_is_locker(false);
+					player.run_reset();
+					try_password = -1;
+					password = -1;
+					clue.clear();
+				}
+				else
+				{
+					player.add_resource(-1);
+				}
+			}
+		}
 		break;
 	}
 
@@ -215,6 +303,7 @@ void MazeGame::on_render()
 		outtextxy(40, 290, L"列数");
 		outtextxy(40, 370, L"层数");
 		outtextxy(40, 450, L"游玩类型");
+		outtextxy(400, 210, L"输出n个迷宫");
 		if (ai_selector.GetSelectedText() == L"AI")
 		{
 			outtextxy(40, 530, L"AI策略");
@@ -227,6 +316,8 @@ void MazeGame::on_render()
 		col_selector.on_render();
 		layer_selector.on_render();
 		ai_selector.on_render();
+		count_selector.on_render();
+		generate_button.on_render();
 		break;
 	case Gamer:
 	case Ai:
@@ -260,11 +351,11 @@ void MazeGame::on_render()
 	}
 	case Locker:
 	{
-		settextstyle(30, 12, L"微软雅黑");
+		settextstyle(28, 11, L"微软雅黑");
 
 		std::wstring text = L"当前金币: " + std::to_wstring(player.get_resource());
 		outtextxy(20, 160, text.c_str());
-		text = L"目标密码的哈希值：" + string_to_wstring(sha256::hash_string(to_three_digit_string(password)));
+		text = L"目标密码的哈希值:" + string_to_wstring(sha256::hash_string(to_three_digit_string(password)));
 		outtextxy(20, 200, text.c_str());
 		if (try_password != -1)
 		{
@@ -301,9 +392,12 @@ void MazeGame::on_render()
 			outtextxy(20, 320 + 40 * i, text.c_str());
 
 		}
-		
-		password_input.on_render();
-		enter_button.on_render();
+		if(!is_ai)
+		{
+			password_input.on_render();
+			enter_button.on_render();
+			skip_button.on_render();
+		}
 	}
 	}
 	/*if (state != generate)
@@ -344,6 +438,8 @@ void MazeGame::on_input(const ExMessage& msg)
 		col_selector.on_input(msg);
 		layer_selector.on_input(msg);
 		ai_selector.on_input(msg);
+		count_selector.on_input(msg);
+		generate_button.on_input(msg);
 		if (ai_selector.GetSelectedText() == L"AI")
 		{
 			ai_mode_selector.on_input(msg);
@@ -363,8 +459,12 @@ void MazeGame::on_input(const ExMessage& msg)
 		}
 		break;
 	case Locker:
-		enter_button.on_input(msg);
-		password_input.on_input(msg);
+		if(!is_ai)
+		{
+			enter_button.on_input(msg);
+			password_input.on_input(msg);
+			skip_button.on_input(msg);
+		}
 	}
 
 	/*if (msg.message == WM_KEYDOWN && msg.vkcode == 0x51)

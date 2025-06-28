@@ -1,6 +1,8 @@
 #include "maze.h"
 #include <iostream>
 #include "optimal_path.h"
+#include <fstream>
+#include "json/json.h"
 
 MazeLayer::MazeLayer(int rows, int cols) : rows(rows), cols(cols)
 {
@@ -30,14 +32,18 @@ MazeLayer::~MazeLayer()
 	}
 }
 
-void MazeLayer::divide(int x, int y, int width, int height)
+void MazeLayer::divide(int x, int y, int width, int height, bool is_show_process)
 {
-	BeginBatchDraw();
-	cleardevice();
-	on_render(false);
-	FlushBatchDraw();
-	Sleep(30);
-	if (width <= 1 || height <= 1) return;
+	if(is_show_process)
+	{
+		BeginBatchDraw();
+		cleardevice();
+		on_render(false);
+		FlushBatchDraw();
+		Sleep(30);
+	}
+	if (width <= 2 || height <= 2) return;
+
 
 	// 优先从较大的一边分割
 	bool prefer_vertical = (width > height);
@@ -101,8 +107,8 @@ void MazeLayer::divide(int x, int y, int width, int height)
 		}
 		 
 		// 递归左右区域
-		divide(x, y, wall_x - x, height);                      // 左区域
-		divide(wall_x + 1, y, x + width - wall_x - 1, height); // 右区域
+		divide(x, y, wall_x - x, height, is_show_process);                      // 左区域
+		divide(wall_x + 1, y, x + width - wall_x - 1, height, is_show_process); // 右区域
 
 
 	}
@@ -150,8 +156,8 @@ void MazeLayer::divide(int x, int y, int width, int height)
 		}
 
 		// 递归上下区域
-		divide(x, y, width, wall_y - y);                       // 上区域
-		divide(x, wall_y + 1, width, y + height - wall_y - 1); // 下区域
+		divide(x, y, width, wall_y - y, is_show_process);                       // 上区域
+		divide(x, wall_y + 1, width, y + height - wall_y - 1, is_show_process); // 下区域
 	}
 }
 
@@ -231,20 +237,20 @@ void MazeLayer::generate_gold_and_trap()
 			}
 
 			// 从这一小块中随机挑一个位置
-			if (!empty_cells.empty() && Random::chance(0.25)) // 25% 的块可能生成资源
+			if (!empty_cells.empty() && Random::chance(0.35)) // 35% 的块可能生成资源
 			{
 				Vector2 pos = Random::choice(empty_cells);
 
 				if (Random::chance(0.6))  // 60% 概率金币 / 40% 陷阱
 				{
 					delete grid[pos.x][pos.y];
-					grid[pos.x][pos.y] = new Gold(Random::randint(50, 100));
+					grid[pos.x][pos.y] = new Gold(Random::randint(150, 200));
 					grid[pos.x][pos.y]->set_pos(pos);
 				}
 				else
 				{
 					delete grid[pos.x][pos.y];
-					grid[pos.x][pos.y] = new Trap(Random::randint(40, 80));
+					grid[pos.x][pos.y] = new Trap(Random::randint(100, 140));
 					grid[pos.x][pos.y]->set_pos(pos);
 				}
 			}
@@ -252,7 +258,7 @@ void MazeLayer::generate_gold_and_trap()
 	}
 }
 
-void MazeLayer::generate_lock()
+void MazeLayer::generate_lock_and_boss()
 {
 	std::vector<Vector2> doors;
 	
@@ -273,6 +279,13 @@ void MazeLayer::generate_lock()
 	delete grid[locker_pos.x][locker_pos.y];
 	grid[locker_pos.x][locker_pos.y] = new Locker();
 	grid[locker_pos.x][locker_pos.y]->set_pos(locker_pos);
+
+	if (doors.size() < 2) return;
+
+	boss_pos = doors[1];
+	delete grid[boss_pos.x][boss_pos.y];
+	grid[boss_pos.x][boss_pos.y] = new Boss();
+	grid[boss_pos.x][boss_pos.y]->set_pos(boss_pos);
 }
 
 void MazeLayer::reset(int row, int col)
@@ -312,24 +325,31 @@ int MazeLayer::getCols() const
 
 
 
-void MazeLayer::generate()
+void MazeLayer::generate(bool is_show_process)
 {
-	divide(0, 0, cols, rows);
+	divide(0, 0, cols, rows, is_show_process);
 	generate_entry_and_exit();
 
-	BeginBatchDraw();
-	cleardevice();
-	on_render(false);
-	FlushBatchDraw();
-	Sleep(150);
+	if(is_show_process)
+	{
+		BeginBatchDraw();
+		cleardevice();
+		on_render(false);
+		FlushBatchDraw();
+		Sleep(150);
+	}
 
 	generate_gold_and_trap();
-	generate_lock();
-	BeginBatchDraw();
-	cleardevice();
-	on_render(false);
-	FlushBatchDraw();
-	Sleep(150);
+	generate_lock_and_boss();
+
+	if (is_show_process)
+	{
+		BeginBatchDraw();
+		cleardevice();
+		on_render(false);
+		FlushBatchDraw();
+		Sleep(150);
+	}
 }
 
 void MazeLayer::on_render(bool is_show_resource)
@@ -402,6 +422,80 @@ std::vector<Vector2> MazeLayer::get_coins_pos() const
 	}
 
 	return coins_pos;
+}
+
+void MazeLayer::save_maze_to_json(const std::vector<std::vector<TileType>>& maze, const std::string& filename, unsigned int seed)
+{
+	Json::Value root;
+	Json::Value maze_array(Json::arrayValue);
+
+	for (const auto& row : maze)
+	{
+		Json::Value json_row(Json::arrayValue);
+		for (TileType c : row)
+		{
+			std::string s;
+			switch (c)
+			{
+			case TileType::Wall:
+				s = "#";
+				break;
+			case TileType::Path:
+			case TileType::Empty:
+			case TileType::DOOR:
+				s = " ";
+				break;
+			case TileType::Start:
+				s = "S";
+				break;
+			case TileType::End:
+				s = "E";
+				break;
+			case TileType::Gold:
+				s = "G";
+				break;
+			case TileType::Trap:
+				s = "T";
+				break;
+			case TileType::Boss:
+				s = "B";
+				break;
+			case TileType::Locker:
+				s = "L";
+				break;
+			}
+			json_row.append(s);
+		}
+		maze_array.append(json_row);
+	}
+
+	root["maze"] = maze_array;
+	root["seed"] = seed;
+
+	std::ofstream ofs(filename);
+	if (!ofs.is_open())
+	{
+		std::cerr << "无法打开文件: " << filename << std::endl;
+		return;
+	}
+
+	Json::StyledWriter writer;
+	ofs << writer.write(root);
+
+	ofs.close();
+}
+
+void MazeLayer::generate_multiple_mazes(int count, int rows, int cols)
+{
+	for (int i = 0; i < count; i++)
+	{
+		unsigned int seed = Random::init();
+		MazeLayer maze(rows, cols);
+		maze.generate(false); 
+
+		std::string filename = "maze_result/maze_" + std::to_string(i + 1) + ".json";
+		save_maze_to_json(maze.get_simple_grid(), filename, seed);
+	}
 }
 
 Maze::Maze(int l, int r, int c) :layers(l), rows(r), cols(c)

@@ -4,7 +4,6 @@
 #include "option_selector.h"
 #include "player.h"
 #include "random.h"
-#include "boss.h"
 #include "optimal_path.h"
 #include "button.h"
 #include "util.h"
@@ -86,6 +85,10 @@ private:
 
 	TextInput password_input;
 	Button enter_button;
+	Button skip_button;
+
+	OptionSelector count_selector;
+	Button generate_button;
 
 	GreedyPick gp;
 
@@ -94,10 +97,11 @@ private:
 	int ai_path_idx;
 	
 private:
-	PasswordCracker* pc = nullptr;
-	CrackingSession cs;
 	int password;
 	int try_password;
 	std::vector<std::vector<int> > clue;
+
+	int ai_try_password_idx;
+	std::vector<std::string> ai_try_passwords;
 };
 

@@ -67,6 +67,7 @@ void Gold::on_update(int delta)
 void Gold::on_enter(Player& player)
 {
 	Tile::on_enter(player);
+	if (is_triggered)return;
 	player.add_resource(value);
 	is_triggered = true;
 }
@@ -139,12 +140,16 @@ void Locker::on_render(bool is_show_resource)
 	Tile::on_render(is_show_resource);
 	const int TILE_SIZE = Grid::cellSize;
 	Rect rect = { Grid::toPixelX(pos.x) + 2, Grid::toPixelY(pos.y) + 2, TILE_SIZE, TILE_SIZE };
-	putimage_alpha(ResourcesManager::instance()->find_image("locker"), &rect);
+	if(is_triggered) putimage_alpha(ResourcesManager::instance()->find_image("locker_right"), &rect);
+	else putimage_alpha(ResourcesManager::instance()->find_image("locker_red"), &rect);
 }
 
 void Locker::on_enter(Player& player)
 {
+	if (is_triggered)return;
+
 	player.set_is_locker(true);
+	is_triggered = true;
 }
 
 void Locker::generate_clue()
@@ -192,4 +197,18 @@ void Locker::generate_clue()
 		clue.push_back(candidates[i]);
 	}
 
+}
+
+void Boss::on_render(bool is_show_resource)
+{
+	Tile::on_render(is_show_resource);
+	const int TILE_SIZE = Grid::cellSize;
+	Rect rect = { Grid::toPixelX(pos.x), Grid::toPixelY(pos.y), TILE_SIZE, TILE_SIZE };
+	if (is_triggered) putimage_alpha(ResourcesManager::instance()->find_image("die_boss"), &rect);
+	else putimage_alpha(ResourcesManager::instance()->find_image("boss"), &rect);
+}
+
+void Boss::on_enter(Player& player)
+{
+	is_triggered = true;
 }

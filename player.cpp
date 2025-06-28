@@ -208,6 +208,9 @@ bool Player::move_to(Vector2 pos, MazeLayer& ml)
 
 	if (ml.isWalkable(pos.x, pos.y))
 	{
+		std::cout << pos.x << ',' << pos.y << std::endl;
+		if (this->pos.x > pos.x)is_facing_right = false;
+		else is_facing_right = true;
 		last_image_pos = image_pos;
 		this->pos = pos; 
 		timer_move.restart();

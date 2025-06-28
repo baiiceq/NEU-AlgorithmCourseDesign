@@ -16,14 +16,15 @@ private:
     std::vector<Vector2> gold_pos;
     std::vector<Vector2> trap_pos;
     Vector2 locker_pos;
+    Vector2 boss_pos;
 
-    void divide(int left, int top, int right, int bottom);
+    void divide(int left, int top, int right, int bottom, bool is_show_process);
 
     void generate_entry_and_exit();
 
     void generate_gold_and_trap();
 
-    void generate_lock();
+    void generate_lock_and_boss();
 
 public:
     MazeLayer(int rows, int cols);
@@ -40,7 +41,7 @@ public:
     int getRows() const;
     int getCols() const;
 
-    void generate();  // 分治生成本层
+    void generate(bool is_show_process = true);  // 分治生成本层
 
     void on_render(bool is_show_resource);
     void on_update(int delta);
@@ -79,6 +80,12 @@ public:
     std::vector<std::vector<int> > get_resource_grid() const;
 
     std::vector<Vector2> get_coins_pos() const;
+
+public:
+    static void save_maze_to_json(const std::vector<std::vector<TileType> >& maze, const std::string& filename, unsigned int seed);
+
+    static void generate_multiple_mazes(int count, int rows, int cols);
+
 };
 
 

@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <functional>
-#include "boss.h"
 
 #include "skill.h"
 #include "vector2.h"
@@ -13,7 +12,7 @@ class MazeLayer;
 class Player
 {
 public:
-    Player(Vector2 start = {0, 0}, int hp = 100, int init_resource = 100);
+    Player(Vector2 start = {0, 0}, int hp = 100, int init_resource = 1000);
 
     void on_input(const ExMessage& msg);
 
@@ -59,6 +58,14 @@ public:
 	{
 		return is_locker;
 	}
+
+    void run_reset()
+    {
+        is_running_down = false;
+        is_running_up = false;
+        is_running_right = false;
+        is_running_left = false;
+    }
     int getHealth() const;
     void addHealth(int val);
     void reduceHealth(int val);

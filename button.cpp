@@ -34,6 +34,10 @@ void Button::on_render()
 	setbkmode(TRANSPARENT);
 	settextcolor(BLACK);
 
+	int font_height = h * 3 / 4;
+	int font_width = font_height / 3;       
+	settextstyle(font_height, font_width, L"微软雅黑");
+
 	// 计算文字居中位置
 	int text_width = textwidth(text.c_str());
 	int text_height = textheight(text.c_str());
@@ -72,4 +76,5 @@ void Button::on_input(const ExMessage& msg)
 
 void Button::on_update(int delta)
 {
+
 }

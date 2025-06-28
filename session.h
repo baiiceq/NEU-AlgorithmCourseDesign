@@ -14,6 +14,11 @@ public:
     // 运行整个破译会话的主方法，接收一个目标密码
     void run(const std::string& target_password);
 
+    std::vector<std::string> get_attempts()
+    {
+        return attempts;
+    }
+
 
     // 获取由用户密码生成的SHA-256哈希值
     // 声明为 const 是因为此函数不会修改类的任何成员变量
@@ -28,6 +33,7 @@ private:
     // --- 私有成员变量 ---
     std::string originalPassword_;
     std::vector<std::vector<int>> clues_;
+    std::vector<std::string> attempts;
 
     // --- 私有辅助方法 ---
     // 接收一个密码并进行设置

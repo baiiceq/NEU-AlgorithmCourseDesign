@@ -24,7 +24,11 @@ static const std::vector<ImageResInfo> image_info_list =
 	{"start",                  _T(R"(resources\start.png)")},
 	{"exit",                   _T(R"(resources\exit.png)")},
 	{"locker",                 _T(R"(resources\locker.png)")},
+	{"locker_right",           _T(R"(resources\locker_right.png)")},
+	{"locker_red",             _T(R"(resources\locker_red.png)")},
 	{"right_path",             _T(R"(resources\right_path.png)")},
+	{"boss",                   _T(R"(resources\boss.png)")},
+	{"die_boss",               _T(R"(resources\die_boss.png)")},
 };
 
 static const std::vector<AtlasResInfo> atlas_info_list =
