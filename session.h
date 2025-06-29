@@ -20,6 +20,9 @@ public:
     // 获取上一次破解会话使用的方向
     int getLastCrackDirection() const;
 
+    // 接收一个哈希值，并尝试将其破解为三位数密码
+    static std::string hashToPassword(const std::string& hash_to_crack);
+
 private:
     // --- 私有成员变量 ---
     std::string originalPassword_;

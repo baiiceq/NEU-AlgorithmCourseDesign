@@ -147,3 +147,26 @@ std::vector<int> CrackingSession::parseClue(const std::string& line) {
     }
     return clue;
 }
+
+// 接收一个哈希值，并尝试通过暴力破解（000-999）找到对应的三位数密码
+std::string CrackingSession::hashToPassword(const std::string& hash_to_crack) {
+    // 遍历所有可能的三位数密码
+    for (int i = 0; i <= 999; ++i) {
+        // 将数字格式化为三位字符串 (例如: 5 -> "005")
+        std::string candidate = std::to_string(i);
+        while (candidate.length() < 3) {
+            candidate = "0" + candidate;
+        }
+
+        // 计算候选密码的哈希值
+        std::string candidate_hash = sha256::hash_string(candidate);
+
+        // 如果哈希值匹配，则返回找到的密码
+        if (candidate_hash == hash_to_crack) {
+            return candidate;
+        }
+    }
+
+    // 如果遍历完所有可能都没有找到匹配项，返回空字符串
+    return "";
+}
