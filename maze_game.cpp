@@ -52,6 +52,14 @@ MazeGame::MazeGame()
 			MessageBox(GetHWnd(), _T("生成成功"), _T("成功"), MB_OK);
 		});
 
+	load_button.set_text(L"读取");
+	load_button.set_pos(6.5f * left_x, top_y + 3 * gap_y);
+	load_button.set_size(120, 50);
+	load_button.set_on_click([&]() 
+		{
+			std::wstring filename = open_json_file_dialog();
+		});
+
 	start_button.set_text(L"开始游戏");
 	start_button.set_pos(right_x, top_y + 5 * gap_y);
 	start_button.set_size(120, 50);
@@ -318,6 +326,7 @@ void MazeGame::on_render()
 		ai_selector.on_render();
 		count_selector.on_render();
 		generate_button.on_render();
+		load_button.on_render();
 		break;
 	case Gamer:
 	case Ai:
@@ -440,6 +449,7 @@ void MazeGame::on_input(const ExMessage& msg)
 		ai_selector.on_input(msg);
 		count_selector.on_input(msg);
 		generate_button.on_input(msg);
+		load_button.on_input(msg);
 		if (ai_selector.GetSelectedText() == L"AI")
 		{
 			ai_mode_selector.on_input(msg);

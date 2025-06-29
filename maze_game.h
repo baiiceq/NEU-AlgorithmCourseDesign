@@ -86,6 +86,7 @@ private:
 	TextInput password_input;
 	Button enter_button;
 	Button skip_button;
+	Button load_button;
 
 	OptionSelector count_selector;
 	Button generate_button;
@@ -103,5 +104,28 @@ private:
 
 	int ai_try_password_idx;
 	std::vector<std::string> ai_try_passwords;
+
+	std::wstring open_json_file_dialog() 
+	{
+		wchar_t filename[MAX_PATH] = L"";
+
+		OPENFILENAME ofn = { 0 };
+		ofn.lStructSize = sizeof(OPENFILENAME);
+		ofn.hwndOwner = GetHWnd(); 
+		ofn.lpstrFilter = L"JSON 文件 (*.json)\0*.json\0所有文件 (*.*)\0*.*\0";
+		ofn.lpstrFile = filename;
+		ofn.nMaxFile = MAX_PATH;
+		ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+		ofn.lpstrTitle = L"选择一个迷宫 JSON 文件";
+
+		if (GetOpenFileName(&ofn))
+		{
+			return std::wstring(filename);
+		}
+		else 
+		{
+			return L""; 
+		}
+	}
 };
 

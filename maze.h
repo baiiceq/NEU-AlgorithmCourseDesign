@@ -38,6 +38,8 @@ public:
 
     void reset(int row, int col);
 
+    void load_maze_from_json(const std::vector<std::vector<TileType> >& simple_grid);
+
     int getRows() const;
     int getCols() const;
 
@@ -101,6 +103,8 @@ public:
     void on_update(int delta, int layer);
 
     void reset(int layer, int row, int col);
+
+    void load_maze_from_json(std::wstring filename);
 
 	MazeLayer& get_layer(int layer)
 	{

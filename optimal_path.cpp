@@ -140,12 +140,12 @@ PathResult OptimalPath::find_best_path(const Vector2& start, const Vector2& end,
         }
     }
 
-    int num_masks = 1 << coin_count;
+    long long num_masks = static_cast<long long>(1) << coin_count;
 
     // DP表: dp[mask][i] = 访问了mask中的金币，当前停在金币i时的最大收益
-    std::vector<std::vector<int>> dp(num_masks, std::vector<int>(num_points, -1));
+    std::vector<std::vector<int>> dp(num_masks + 1, std::vector<int>(num_points + 1, -1));
     // Parent表，用于回溯路径: parent[mask][i] = {上一个状态的mask, 上一个Point的ID}
-    std::vector<std::vector<std::pair<int, int>>> parent(num_masks, std::vector<std::pair<int, int>>(num_points, { -1, -1 }));
+    std::vector<std::vector<std::pair<int, int>>> parent(num_masks + 1, std::vector<std::pair<int, int>>(num_points + 1, { -1, -1 }));
 
     // 起点
     int start_point_id = 0;

@@ -32,6 +32,135 @@ MazeLayer::~MazeLayer()
 	}
 }
 
+//void MazeLayer::divide(int x, int y, int width, int height, bool is_show_process)
+//{
+//	if (is_show_process)
+//	{
+//		BeginBatchDraw();
+//		cleardevice();
+//		on_render(false);
+//		FlushBatchDraw();
+//		Sleep(30);
+//	}
+//	if (width <= 2 || height <= 2) return;
+//
+//
+//	// 优先从较大的一边分割
+//	bool prefer_vertical = (width > height);
+//	bool can_vertical = (width > 1);
+//	bool can_horizontal = (height > 1);
+//	bool do_vertical;
+//
+//	if (width == height)
+//	{
+//		do_vertical = Random::randint(0, 1);
+//	}
+//	else
+//	{
+//		do_vertical = (prefer_vertical && can_vertical) || (!can_horizontal && can_vertical);
+//	}
+//
+//	const int MAX_RETRY = 10;
+//
+//	if (!can_vertical && !can_horizontal) return;
+//
+//	if (do_vertical)
+//	{
+//		if (width < 3) return;
+//
+//		int wall_x;
+//		bool valid = false;
+//
+//		// 尝试多次，找到不含门的横墙位置
+//		for (int attempt = 0; attempt < MAX_RETRY; ++attempt)
+//		{
+//			wall_x = x + Random::randint(1, width - 2);
+//
+//			bool has_door = false;
+//			for (int i = max(0, y - 1); i < min(y + height + 1, rows); i++)
+//			{
+//				if (grid[i][wall_x]->get_type() == TileType::DOOR)
+//				{
+//					has_door = true;
+//					break;
+//				}
+//			}
+//
+//			if (!has_door)
+//			{
+//				valid = true;
+//				break;
+//			}
+//		}
+//
+//		if (!valid) return;
+//		int door_y = y + Random::randint(0, height - 1);   // 门可以在整条墙上
+//
+//		for (int i = y; i < y + height; i++)
+//		{
+//			if (i == door_y)
+//			{
+//				grid[i][wall_x]->set_type(TileType::DOOR);
+//				continue;
+//			}
+//			grid[i][wall_x]->set_type(TileType::Wall);
+//		}
+//
+//		// 递归左右区域
+//		divide(x, y, wall_x - x, height, is_show_process);                      // 左区域
+//		divide(wall_x + 1, y, x + width - wall_x - 1, height, is_show_process); // 右区域
+//
+//
+//	}
+//	else
+//	{
+//		if (height < 3) return;
+//
+//		int wall_y;
+//		bool valid = false;
+//
+//		// 尝试多次，找到不含门的横墙位置
+//		for (int attempt = 0; attempt < MAX_RETRY; ++attempt)
+//		{
+//			wall_y = y + Random::randint(1, height - 2);
+//
+//			bool has_door = false;
+//			for (int i = max(0, x - 1); i < min(x + width + 1, cols); i++)
+//			{
+//				if (grid[wall_y][i]->get_type() == TileType::DOOR)
+//				{
+//					has_door = true;
+//					break;
+//				}
+//			}
+//
+//			if (!has_door)
+//			{
+//				valid = true;
+//				break;
+//			}
+//		}
+//
+//		if (!valid) return;
+//
+//		int door_x = x + Random::randint(0, width - 1);     // 门可以在整条墙上
+//
+//		for (int i = x; i < x + width; i++)
+//		{
+//			if (i == door_x)
+//			{
+//				grid[wall_y][i]->set_type(TileType::DOOR);
+//				continue;
+//			}
+//			grid[wall_y][i]->set_type(TileType::Wall);
+//		}
+//
+//		// 递归上下区域
+//		divide(x, y, width, wall_y - y, is_show_process);                       // 上区域
+//		divide(x, wall_y + 1, width, y + height - wall_y - 1, is_show_process); // 下区域
+//	}
+//}
+
 void MazeLayer::divide(int x, int y, int width, int height, bool is_show_process)
 {
 	if(is_show_process)
@@ -60,98 +189,37 @@ void MazeLayer::divide(int x, int y, int width, int height, bool is_show_process
 		do_vertical = (prefer_vertical && can_vertical) || (!can_horizontal && can_vertical);
 	}
 
-	const int MAX_RETRY = 10;
-
 	if (!can_vertical && !can_horizontal) return;
 
 	if (do_vertical) 
 	{
 		if (width < 3) return;
 
-		int wall_x;
-		bool valid = false;
-
-		// 尝试多次，找到不含门的横墙位置
-		for (int attempt = 0; attempt < MAX_RETRY; ++attempt)
-		{
-			wall_x = x + Random::randint(1, width - 2);
-
-			bool has_door = false;
-			for (int i = max(0, y - 1); i < min(y + height + 1, rows) ; i++)
-			{
-				if (grid[i][wall_x]->get_type() == TileType::DOOR)
-				{
-					has_door = true;
-					break;
-				}
-			}
-
-			if (!has_door)
-			{
-				valid = true;
-				break;
-			}
-		}
-
-		if (!valid) return;
-		int door_y = y + Random::randint(0, height - 1);   // 门可以在整条墙上
+		int wall_x = x + 2 * Random::randint(0, (width - 2) / 2) + 1;
+		int door_y = y + 2 * Random::randint(0, (height - 1) / 2);
 
 		for (int i = y; i < y + height; i++) 
 		{
 			if (i == door_y)
-			{
-				grid[i][wall_x]->set_type(TileType::DOOR);
 				continue;
-			}
 			grid[i][wall_x]->set_type(TileType::Wall);
 		}
 		 
 		// 递归左右区域
 		divide(x, y, wall_x - x, height, is_show_process);                      // 左区域
 		divide(wall_x + 1, y, x + width - wall_x - 1, height, is_show_process); // 右区域
-
-
 	}
 	else 
 	{
 		if (height < 3) return;
 
-		int wall_y;
-		bool valid = false;
-
-		// 尝试多次，找到不含门的横墙位置
-		for (int attempt = 0; attempt < MAX_RETRY; ++attempt)
-		{
-			wall_y = y + Random::randint(1, height - 2);
-
-			bool has_door = false;
-			for (int i = max(0, x - 1); i < min(x + width + 1, cols); i++) 
-			{
-				if (grid[wall_y][i]->get_type() == TileType::DOOR)
-				{
-					has_door = true;
-					break;
-				}
-			}
-
-			if (!has_door)
-			{
-				valid = true;
-				break;
-			}
-		}
-
-		if (!valid) return;
-
-		int door_x = x + Random::randint(0, width - 1);     // 门可以在整条墙上
+		int wall_y = y + 2 * Random::randint(0, (height - 2) / 2) + 1;
+		int door_x = x + 2 * Random::randint(0, (width - 1) / 2);   
 
 		for (int i = x; i < x + width; i++)
 		{
 			if (i == door_x)
-			{
-				grid[wall_y][i]->set_type(TileType::DOOR);
 				continue;
-			}
 			grid[wall_y][i]->set_type(TileType::Wall);
 		}
 
@@ -187,7 +255,7 @@ void MazeLayer::generate_entry_and_exit()
 
 	// 当出口与入口距离大于最佳距离时，选择该出口
 	// 若所有出口都不满足条件，则选择距离最远的出口
-	int best_dist = (rows + cols) / 2;
+	int best_dist = (rows + cols) / 1.2f;
 	int now_dist = -1;
 	Vector2 best_end = valid_tiles[1];
 
@@ -230,14 +298,13 @@ void MazeLayer::generate_gold_and_trap()
 				for (int dj = 0; dj < block_size && j + dj < cols; ++dj)
 				{
 					if (grid[i + di][j + dj]->get_type() == TileType::Empty || 
-						grid[i + di][j + dj]->get_type() == TileType::DOOR  ||
 						grid[i + di][j + dj]->get_type() == TileType::Path)
 						empty_cells.push_back(Vector2((float)(i + di), (float)(j + dj)));
 				}
 			}
 
 			// 从这一小块中随机挑一个位置
-			if (!empty_cells.empty() && Random::chance(0.35)) // 35% 的块可能生成资源
+			if (!empty_cells.empty() && Random::chance(0.8)) // 35% 的块可能生成资源
 			{
 				Vector2 pos = Random::choice(empty_cells);
 
@@ -265,7 +332,7 @@ void MazeLayer::generate_lock_and_boss()
 	auto path = OptimalPath::find_direct_path(start_pos, end_pos, this->get_resource_grid(), this->get_simple_grid());
 	for (auto pos : path.path)
 	{
-		if (grid[pos.x][pos.y]->get_type() == TileType::DOOR)
+		if (grid[pos.x][pos.y]->get_type() == TileType::Path)
 		{
 			doors.push_back(pos);
 		}
@@ -313,6 +380,48 @@ void MazeLayer::reset(int row, int col)
 	}
 }
 
+void MazeLayer::load_maze_from_json(const std::vector<std::vector<TileType>>& simple_grid)
+{
+	gold_pos.clear();
+	trap_pos.clear();
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			delete grid[i][j];
+			switch (simple_grid[i][j])
+			{
+			case TileType::Wall:
+				grid[i][j] = new Tile(TileType::Wall);
+				break;
+			case TileType::Path:
+			case TileType::Empty:
+				grid[i][j] = new Tile();
+				break;
+			case TileType::Start:
+				grid[i][j] = new Start();
+				start_pos = { (float)i, (float)j };
+				break;
+			case TileType::End:
+				grid[i][j] = new End();
+				end_pos = { (float)i, (float)j };
+			case TileType::Gold:
+				grid[i][j] = new Gold(100);
+				gold_pos.emplace_back((float)i, (float)j);
+				break;
+			case TileType::Trap:
+				grid[i][j] = new Trap(30);
+				trap_pos.emplace_back((float)i, (float)j);
+				break;
+			case TileType::Locker:
+				grid[i][j] = new Locker();
+			default:
+				break;
+			}
+		}
+	}
+}
+
 int MazeLayer::getRows() const
 {
 	return rows;
@@ -328,6 +437,21 @@ int MazeLayer::getCols() const
 void MazeLayer::generate(bool is_show_process)
 {
 	divide(0, 0, cols, rows, is_show_process);
+	if (!(cols & 1))
+	{
+		for (int i = 0; i < rows; i++)
+		{
+			grid[i][cols - 1]->set_type(TileType::Wall);
+		}
+	}
+
+	if (!(rows & 1))
+	{
+		for (int i = 0; i < cols; i++)
+		{
+			grid[rows - 1][i]->set_type(TileType::Wall);
+		}
+	}
 	generate_entry_and_exit();
 
 	if(is_show_process)
@@ -533,5 +657,49 @@ void Maze::reset(int layer, int row, int col)
 		maze.emplace_back(rows, cols);
 	}
 
+}
+
+void Maze::load_maze_from_json(std::wstring filename)
+{
+	std::ifstream ifs(filename);
+	if (!ifs.is_open()) 
+	{
+		std::cerr << "无法打开文件: " << filename.c_str() << std::endl;
+		return ;
+	}
+
+	Json::Value root;
+	Json::CharReaderBuilder builder;
+	std::string errs;
+	Json::parseFromStream(builder, ifs, &root, &errs);
+
+	std::vector<std::vector<TileType>> simple_maze;
+
+	const auto& json_maze = root["maze"];
+	for (const auto& row : json_maze) 
+	{
+		std::vector<TileType> maze_row;
+		for (const auto& cell : row) 
+		{
+			std::string val = cell.asString();
+			if (val == "#")       maze_row.push_back(TileType::Wall);
+			else if (val == " ")  maze_row.push_back(TileType::Path);
+			else if (val == "S")  maze_row.push_back(TileType::Start);
+			else if (val == "E")  maze_row.push_back(TileType::End);
+			else if (val == "G")  maze_row.push_back(TileType::Gold);
+			else if (val == "T")  maze_row.push_back(TileType::Trap);
+			else if (val == "L")  maze_row.push_back(TileType::Locker);
+			else if (val == "B")  maze_row.push_back(TileType::Boss);
+			else                  maze_row.push_back(TileType::Empty);
+		}
+		simple_maze.push_back(maze_row);
+	}
+	cols = simple_maze[0].size();
+	rows = simple_maze.size();
+	layers = 1;
+	maze.clear();
+
+	MazeLayer ml(rows,cols);
+	ml.load_maze_from_json(simple_maze);
 }
 

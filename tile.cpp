@@ -50,9 +50,11 @@ void Gold::on_render(bool is_show_resource)
 	if (is_show_resource)
 	{
 		setbkmode(TRANSPARENT);
-		settextstyle(25, 10, L"Î¢ÈíÑÅºÚ");
+		settextstyle(20, 8, L"Î¢ÈíÑÅºÚ");
+		settextcolor(BLACK);
 		std::wstring gold_text = std::to_wstring(value);
 		outtextxy(Grid::toPixelX(pos.x) + 10, Grid::toPixelY(pos.y) + 10, gold_text.c_str());
+		settextcolor(WHITE);
 	}
 }
 
@@ -91,9 +93,11 @@ void Trap::on_render(bool is_show_resource)
 	if (is_show_resource)
 	{
 		setbkmode(TRANSPARENT);
-		settextstyle(25, 10, L"Î¢ÈíÑÅºÚ");
+		settextcolor(BLACK);
+		settextstyle(20, 8, L"Î¢ÈíÑÅºÚ");
 		std::wstring damage_text = std::to_wstring(damage);
 		outtextxy(Grid::toPixelX(pos.x) + 10, Grid::toPixelY(pos.y) + 10, damage_text.c_str());
+		settextcolor(WHITE);
 	}
 }
 
