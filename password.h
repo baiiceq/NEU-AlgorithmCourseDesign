@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <random> 
 
 class PasswordCracker {
 public:
@@ -22,12 +23,19 @@ public:
 
     // 所有尝试的密码列表
     const std::vector<std::string>& getAttemptedPasswords() const;
+
+    // 获取本次破解使用的方向 (0: 正序, 1: 逆序)
+    int getCrackDirection() const;
+
 private:
     std::string targetHash_;
     std::vector<std::vector<int>> clues_;
     std::string foundPassword_;
     bool isFound_;
     int deductedCoins_;
+
+    // 存储破解方向的随机数 (0 for 0-999, 1 for 999-0)
+    int crackDirection_;
 
     // 存储所有符合线索的尝试
     std::vector<std::string> attemptedPasswords_;
