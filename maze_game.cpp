@@ -1,6 +1,8 @@
 #include "maze_game.h"
 #include <graphics.h>
 #include "sha256.h"
+#include "json/json.h"
+#include <fstream>
 
 MazeGame::MazeGame()
 {
@@ -58,6 +60,27 @@ MazeGame::MazeGame()
 	load_button.set_on_click([&]() 
 		{
 			std::wstring filename = open_json_file_dialog();
+			maze.load_maze_from_json(filename);
+			cols = maze.get_col();
+			rows = maze.get_row();
+			layers = 1;
+
+			if (ai_selector.GetSelectedText() == L"AI")
+			{
+				is_ai = true;
+				state = Ai;
+				ai_mode = ai_mode_selector.GetSelected();
+			}
+			else
+			{
+				is_ai = false;
+				state = Gamer;
+			}
+
+			is_maze_generate = true;
+			player.set_position(maze.get_start_pos(now_layer));
+			closegraph();
+			initgraph(max(rows, cols) * Grid::getTileSize() + 300, max(rows, cols) * Grid::getTileSize());
 		});
 
 	start_button.set_text(L"开始游戏");
@@ -65,6 +88,7 @@ MazeGame::MazeGame()
 	start_button.set_size(120, 50);
 	start_button.set_on_click([this]()
 	{
+		is_maze_generate = false;
 		cols = std::stoi(row_selector.GetSelectedText());
 		rows = std::stoi(col_selector.GetSelectedText());
 		layers = std::stoi(layer_selector.GetSelectedText());
@@ -114,7 +138,14 @@ MazeGame::MazeGame()
 	skip_button.set_text(L"跳过");
 	skip_button.set_on_click([&]
 		{
-
+			closegraph();
+			initgraph(max(rows, cols)* Grid::getTileSize() + 300, max(rows, cols)* Grid::getTileSize());
+			state = is_ai ? Ai : Gamer;
+			player.set_is_locker(false);
+			player.run_reset();
+			try_password = -1;
+			password = -1;
+			clue.clear();
 		});
 
 	enter_button.set_pos(760, 60);
@@ -166,6 +197,32 @@ void MazeGame::on_update(int delta)
 
 		if (player.get_pos() == maze.get_end_pos(now_layer) && player.get_is_exit())
 		{
+			if (now_layer == layers - 1)
+			{
+				MessageBox(GetHWnd(), _T("迷宫结束"), _T("成功"), MB_OK);
+				
+				ai_try_passwords.clear();
+				ai_try_password_idx = 0;
+				clue.clear();
+				try_password = -1;
+				password = -1;
+				ai_mode = -1;
+				ai_path.clear();
+				ai_path_idx = 0;
+				seed = 0;
+				bool is_show_resource = false;
+				bool is_ai = false;
+				bool is_maze_generate = false;
+				now_layer = 0;
+
+				state = Init;
+				maze.reset(1, 1, 1);
+				player.reset();
+				
+				closegraph();
+				initgraph(800, 600);
+				return;
+			}
 			maze.generate(++now_layer);
 			player.set_position(maze.get_start_pos(now_layer));
 		}
@@ -176,6 +233,14 @@ void MazeGame::on_update(int delta)
 			try_password = -1;
 			password = maze.get_password(now_layer);
 			clue = maze.get_clue(now_layer);
+			closegraph();
+			initgraph(1080, 720);
+		}
+
+		if (player.get_is_boss())
+		{
+			state = Boss;
+			try_password = -1;
 			closegraph();
 			initgraph(1080, 720);
 		}
@@ -231,12 +296,57 @@ void MazeGame::on_update(int delta)
 			ai_try_passwords.clear();
 			ai_try_passwords = cs.get_attempts();
 			ai_try_password_idx = 0;
+			method1_tries = cs.get_attempts1().size();
+			method2_tries = cs.get_attempts2().size();
+			closegraph();
+			initgraph(1080, 720);
+		}
+
+		if (player.get_is_boss())
+		{
+			state = Boss;
+			try_password = -1;
 			closegraph();
 			initgraph(1080, 720);
 		}
 
 		if (player.get_pos() == maze.get_end_pos(now_layer) && ai_path_idx == ai_path.size())
 		{
+			if (now_layer == layers - 1)
+			{
+				if (layers == 1)
+				{
+					std::string filename = generate_filename();
+					save_ai_result_to_json(filename);
+					MessageBox(GetHWnd(), _T("迷宫结束,AI的结果已保存在maze_test文件夹里"), _T("成功"), MB_OK);
+				}
+				else
+				{
+					MessageBox(GetHWnd(), _T("迷宫结束"), _T("成功"), MB_OK);
+				}
+
+				ai_try_passwords.clear();
+				ai_try_password_idx = 0;
+				clue.clear();
+				try_password = -1;
+				password = -1;
+				ai_mode = -1;
+				ai_path.clear();
+				ai_path_idx = 0;
+				seed = 0;
+				bool is_show_resource = false;
+				bool is_ai = false;
+				bool is_maze_generate = false;
+				now_layer = 0;
+
+				state = Init;
+				maze.reset(1, 1, 1);
+				player.reset();
+
+				closegraph();
+				initgraph(800, 600);
+				return;
+			}
 			maze.generate(++now_layer);
 			player.set_position(maze.get_start_pos(now_layer));
 			ai_path_idx = 0;
@@ -492,4 +602,130 @@ void MazeGame::on_input(const ExMessage& msg)
 	{
 		player.on_input(msg);
 	}*/
+}
+
+void MazeGame::reset()
+{
+	ai_try_passwords.clear();
+	ai_try_password_idx = 0;
+	clue.clear();
+	try_password = -1;
+	password = -1;
+	ai_mode = -1;
+	ai_path.clear();
+	ai_path_idx = 0;
+	seed = 0;
+	bool is_show_resource = false;
+	bool is_ai = false;
+	bool is_maze_generate = false;
+	now_layer = 0;
+	
+	state = Init;
+	maze.reset(1, 1, 1);
+	player.run_reset();
+}
+
+void MazeGame::save_ai_result_to_json(std::string filename)
+{
+	Json::Value root;
+	Json::Value maze_array(Json::arrayValue);
+
+	auto m = maze.get_layer(0).get_simple_grid();
+
+	for (const auto& row : m)
+	{
+		Json::Value json_row(Json::arrayValue);
+		for (TileType c : row)
+		{
+			std::string s;
+			switch (c)
+			{
+			case TileType::Wall:
+				s = "#";
+				break;
+			case TileType::Path:
+			case TileType::Empty:
+			case TileType::DOOR:
+				s = " ";
+				break;
+			case TileType::Start:
+				s = "S";
+				break;
+			case TileType::End:
+				s = "E";
+				break;
+			case TileType::Gold:
+				s = "G";
+				break;
+			case TileType::Trap:
+				s = "T";
+				break;
+			case TileType::Boss:
+				s = "B";
+				break;
+			case TileType::Locker:
+				s = "L";
+				break;
+			}
+			json_row.append(s);
+		}
+		maze_array.append(json_row);
+	}
+
+	root["maze"] = maze_array;
+	root["seed"] = seed;
+
+	Json::Value json_path(Json::arrayValue);
+
+	for (const auto& vec : ai_path)
+	{
+		Json::Value point(Json::arrayValue);
+		point.append((int)vec.y);
+		point.append((int)vec.x);
+		json_path.append(point);
+	}
+
+	root["optimal_path"] = json_path;
+
+	root["max_resource"] = player.get_resource();
+
+	Json::Value json_C(Json::arrayValue);
+	for (const auto& row : clue) 
+	{
+		Json::Value json_row(Json::arrayValue);
+		for (int val : row) 
+		{
+			json_row.append(val);
+		}
+		json_C.append(json_row);
+	}
+	root["C"] = json_C;
+	root["L"] = sha256::hash_string(to_three_digit_string(password));
+	root["password"] = password;
+
+	Json::Value results;
+
+	auto build_method_result = [&](int tries) 
+		{
+		Json::Value result;
+		result["tries"] = tries;
+		return result; 
+		};
+
+	results["method1"] = build_method_result(method1_tries);
+	results["method2"] = build_method_result(method2_tries);
+
+	root["results"] = results;
+
+	std::ofstream ofs(filename);
+	if (!ofs.is_open())
+	{
+		std::cerr << "无法打开文件: " << filename << std::endl;
+		return;
+	}
+
+	Json::StyledWriter writer;
+	ofs << writer.write(root);
+
+	ofs.close();
 }

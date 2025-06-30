@@ -15,17 +15,14 @@ void PasswordCracker::addClue(const std::vector<int>& clue) {
 }
 
 // 破译功能主入口：根据随机数选择正序或逆序破解
-std::string PasswordCracker::crack() {
+std::string PasswordCracker::crack(int mode)
+{
     isFound_ = false;
     foundPassword_ = "";
     deductedCoins_ = 0;
     attemptedPasswords_.clear();
 
-    // 生成随机数来决定破解方向
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> distrib(0, 1);
-    crackDirection_ = distrib(gen); // 0: 正序, 1: 逆序
+    crackDirection_ = mode;
 
     if (crackDirection_ == 1) {
         // 随机数为 1, 从 999 向 0 尝试

@@ -38,6 +38,8 @@ public:
 
 	void on_input(const ExMessage& msg);
 
+	void reset();
+
 private:
 	std::string to_three_digit_string(int num) 
 	{
@@ -52,14 +54,28 @@ private:
 		return converter.from_bytes(str);
 	}
 
+	void save_ai_result_to_json(std::string filename);
+
+	std::string generate_filename(const std::string& prefix = "maze_test/", const std::string& ext = "json")
+	{
+		std::time_t t = std::time(nullptr);
+		std::tm tm;
+		localtime_s(&tm, &t);
+
+		char buf[32];
+		std::strftime(buf, sizeof(buf), "%y%m%d_%H%M", &tm); 
+
+		std::ostringstream oss;
+		oss << prefix << "maze_" << buf << "." << ext;
+		return oss.str();
+	}
+
 
 private:
     Maze maze;
     Player player;
 	GameState state;
 
-	std::vector<Vector2> path_with_no_resource; // 不考虑资源的路径
-	int path_with_no_resource_idx = 0;
 
 	int layers;
 	int rows;
@@ -98,9 +114,17 @@ private:
 	int ai_path_idx;
 	
 private:
+	Button basic_attack;
+	Button skill1;
+	Button skill2;
+	Button skill3;
+
+private:
 	int password;
 	int try_password;
 	std::vector<std::vector<int> > clue;
+	int method1_tries;
+	int method2_tries;
 
 	int ai_try_password_idx;
 	std::vector<std::string> ai_try_passwords;

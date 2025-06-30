@@ -20,6 +20,15 @@ class Tile
 {
 public:
     Tile(TileType type = TileType::Path) : type(type) {}
+    
+    Tile(const Tile& t);
+
+    virtual Tile* clone() const
+    {
+        return new Tile(*this);
+    }
+
+    virtual ~Tile() {}
 
     TileType get_type() const { return type; }
     void set_type(TileType new_type) { type = new_type; }
@@ -51,6 +60,13 @@ class Gold : public Tile
 public:
     Gold(int value = 5);
 
+    Gold(const Gold& g);
+
+    Tile* clone() const override 
+    {
+        return new Gold(*this);  
+    }
+
 	int get_value() const { return value; }
 	void set_value(int new_value) { value = new_value; }
 
@@ -74,6 +90,12 @@ class Trap : public Tile
 {
 public:
     Trap(int damage = 10);
+    Trap(const Trap& t);
+
+    Tile* clone() const override
+    {
+        return new Trap(*this);
+    }
 
 	int get_damage() const { return damage; }
 	void set_damage(int new_damage) { damage = new_damage; }
@@ -97,6 +119,13 @@ class Start : public Tile
 public:
 	Start() : Tile(TileType::Start) {}
 
+    Start(const Start& s) : Tile(s){}
+
+    Tile* clone() const override
+    {
+        return new Start(*this);
+    }
+
     void on_render(bool is_show_resource) override;
 
 private:
@@ -108,6 +137,13 @@ class End : public Tile
 {
 public:
     End() : Tile(TileType::End) {}
+
+    End(const Start& e) : Tile(e) {}
+
+    Tile* clone() const override
+    {
+        return new End(*this);
+    }
 
     void on_render(bool is_show_resource) override;
     void on_enter(Player& player) override;
@@ -122,6 +158,18 @@ class Locker : public Tile
 public:
     Locker();
 
+    Locker(const Locker& other)
+        : Tile(other), 
+        clue(other.clue),
+        password(other.password),
+        is_triggered(other.is_triggered)
+    {}
+
+    Tile* clone() const override 
+    {
+        return new Locker(*this);
+    }
+
     void on_render(bool is_show_resource) override;
     void on_enter(Player& player) override;
 
@@ -130,11 +178,21 @@ public:
         return clue; 
     }
 
-    int get_password() { return password; }
+    void set_clue(std::vector<std::vector<int> > c)
+    {
+        clue = c;
+    }
+
+    unsigned int get_password() { return password; }
+
+    void set_password(unsigned int p)
+    {
+        password = p;
+    }
 
 private:
     std::vector<std::vector<int> > clue;
-    int password;
+    unsigned int password;
     bool is_triggered = false;  // 是否被触发过
 
     void generate_clue();
@@ -146,12 +204,37 @@ private:
 class Boss : public Tile
 {
 public:
-    Boss():Tile(TileType::Boss){}
+    Boss();
+
+    Boss(const Boss& other)
+        : Tile(other), 
+        hps(other.hps),
+        is_triggered(other.is_triggered),
+        skills(other.skills)
+    {}
+
+    Tile* clone() const override 
+    {
+        return new Boss(*this);
+    }
+
+    std::vector<int> get_hps() const
+    {
+        return hps;
+    }
+
+    void set_hps(std::vector<int> hps)
+    {
+        this->hps = hps;
+    }
+
+    void generate_hps_and_skills();
 
     void on_render(bool is_show_resource) override;
     void on_enter(Player& player) override;
 
 private:
     std::vector<int> hps;
+    std::vector<std::pair<int, int> > skills;
     bool is_triggered = false;  // 是否被触发过
 };

@@ -3,6 +3,12 @@
 #include "util.h"
 #include "random.h"
 
+Tile::Tile(const Tile& t)
+{
+	this->pos = t.pos;
+	this->type = t.type;
+}
+
 void Tile::on_render(bool is_show_resource)
 {
 	const int TILE_SIZE = Grid::cellSize;
@@ -30,6 +36,16 @@ void Tile::on_enter(Player& player)
 
 Gold::Gold(int value) : Tile(TileType::Gold), value(value) 
 {
+	anim_gold.add_frame(ResourcesManager::instance()->find_atlas("gold"));
+	anim_gold.set_position(Grid::get_image_pos(pos));
+	anim_gold.set_anchor_mode(Animation::AnchorMode::BottomCentered);
+	anim_gold.set_loop(true);
+	anim_gold.set_interval(120);
+}
+
+Gold::Gold(const Gold& g) : Tile(g)
+{
+	this->value = g.value;
 	anim_gold.add_frame(ResourcesManager::instance()->find_atlas("gold"));
 	anim_gold.set_position(Grid::get_image_pos(pos));
 	anim_gold.set_anchor_mode(Animation::AnchorMode::BottomCentered);
@@ -81,6 +97,16 @@ Trap::Trap(int damage) : Tile(TileType::Trap), damage(damage)
 	anim_trap.set_anchor_mode(Animation::AnchorMode::BottomCentered);
 	anim_trap.set_loop(true);
 	anim_trap.set_interval(120);
+}
+
+Trap::Trap(const Trap& t) : Tile(t)
+{
+	anim_trap.add_frame(ResourcesManager::instance()->find_image("trap"), 8);
+	anim_trap.set_position(Grid::get_image_pos(pos));
+	anim_trap.set_anchor_mode(Animation::AnchorMode::BottomCentered);
+	anim_trap.set_loop(true);
+	anim_trap.set_interval(120);
+	this->damage = t.damage;
 }
 
 void Trap::on_render(bool is_show_resource)
@@ -203,6 +229,35 @@ void Locker::generate_clue()
 
 }
 
+Boss::Boss():Tile(TileType::Boss)
+{
+	generate_hps_and_skills();
+}
+
+void Boss::generate_hps_and_skills()
+{
+	int boss_cnt = Random::randint(3, 5);
+	for (int i = 0; i < boss_cnt; i++)
+	{
+		hps.push_back(Random::randint(5, 30));
+	}
+
+	int skill_cnt = Random::randint(2, 4);
+
+	// ÆÕ¹¥
+	skills.push_back({ Random::randint(3,5),0 });
+
+	for (int i = 1; i < skill_cnt; ++i)
+	{
+		int cooldown = Random::randint(1, 2 + i); 
+
+		int damage_base = 6 + i * 2; 
+		int damage = Random::randint(damage_base, damage_base + 3);
+
+		skills.push_back({ damage, cooldown });
+	}
+}
+
 void Boss::on_render(bool is_show_resource)
 {
 	Tile::on_render(is_show_resource);
@@ -214,5 +269,7 @@ void Boss::on_render(bool is_show_resource)
 
 void Boss::on_enter(Player& player)
 {
+	if (is_triggered)return;
 	is_triggered = true;
+	//player.set_is_boss(true);
 }

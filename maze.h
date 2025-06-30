@@ -29,6 +29,8 @@ private:
 public:
     MazeLayer(int rows, int cols);
 
+    MazeLayer(const MazeLayer& ml);
+
     ~MazeLayer();
 
     Tile* get_tile(int x, int y) const
@@ -38,7 +40,7 @@ public:
 
     void reset(int row, int col);
 
-    void load_maze_from_json(const std::vector<std::vector<TileType> >& simple_grid);
+    void load_maze_from_json(std::wstring filename);
 
     int getRows() const;
     int getCols() const;
@@ -84,10 +86,9 @@ public:
     std::vector<Vector2> get_coins_pos() const;
 
 public:
-    static void save_maze_to_json(const std::vector<std::vector<TileType> >& maze, const std::string& filename, unsigned int seed);
+    static void save_maze_to_json(const std::vector<std::vector<TileType> >& maze, const std::string& filename, unsigned int seed, MazeLayer& ml);
 
     static void generate_multiple_mazes(int count, int rows, int cols);
-
 };
 
 
@@ -105,6 +106,16 @@ public:
     void reset(int layer, int row, int col);
 
     void load_maze_from_json(std::wstring filename);
+
+    int get_row() const
+    {
+        return rows;
+    }
+
+    int get_col() const
+    {
+        return cols;
+    }
 
 	MazeLayer& get_layer(int layer)
 	{

@@ -3,6 +3,7 @@
 #include "optimal_path.h"
 #include <fstream>
 #include "json/json.h"
+#include "session.h"
 
 MazeLayer::MazeLayer(int rows, int cols) : rows(rows), cols(cols)
 {
@@ -19,6 +20,32 @@ MazeLayer::MazeLayer(int rows, int cols) : rows(rows), cols(cols)
 			grid[i][j]->set_pos({ (float)i, (float)j });
 		}
 	}
+}
+
+MazeLayer::MazeLayer(const MazeLayer& ml)
+{
+	this->rows = ml.rows;
+	this->cols = ml.cols;
+
+	this->grid.resize(rows, std::vector<Tile*>(cols, nullptr));
+	for (int i = 0; i < rows; ++i)
+	{
+		for (int j = 0; j < cols; ++j)
+		{
+			if (ml.grid[i][j])
+				this->grid[i][j] = ml.grid[i][j]->clone();  
+			else
+				this->grid[i][j] = nullptr;
+		}
+	}
+
+	this->start_pos = ml.start_pos;
+	this->end_pos = ml.end_pos;
+	this->gold_pos = ml.gold_pos;
+	this->trap_pos = ml.trap_pos;
+	this->locker_pos = ml.locker_pos;
+	this->boss_pos = ml.boss_pos;
+
 }
 
 MazeLayer::~MazeLayer()
@@ -380,16 +407,61 @@ void MazeLayer::reset(int row, int col)
 	}
 }
 
-void MazeLayer::load_maze_from_json(const std::vector<std::vector<TileType>>& simple_grid)
+void MazeLayer::load_maze_from_json(std::wstring filename)
 {
-	gold_pos.clear();
-	trap_pos.clear();
+	std::ifstream ifs(filename);
+	if (!ifs.is_open())
+	{
+		std::cerr << "无法打开文件: " << filename.c_str() << std::endl;
+		return;
+	}
+
 	for (int i = 0; i < rows; i++)
 	{
 		for (int j = 0; j < cols; j++)
 		{
 			delete grid[i][j];
-			switch (simple_grid[i][j])
+		}
+	}
+
+	Json::Value root;
+	Json::CharReaderBuilder builder;
+	std::string errs;
+	Json::parseFromStream(builder, ifs, &root, &errs);
+	const auto& json_maze = root["maze"];
+
+	std::vector<std::vector<TileType> > simple_grid;
+	for (const auto& row : json_maze)
+	{
+		std::vector<TileType> grid_row;
+		for (const auto& cell : row)
+		{
+			std::string val = cell.asString();
+			if (val == "#")       grid_row.push_back(TileType::Wall);
+			else if (val == " ")  grid_row.push_back(TileType::Path);
+			else if (val == "S")  grid_row.push_back(TileType::Start);
+			else if (val == "E")  grid_row.push_back(TileType::End);
+			else if (val == "G")  grid_row.push_back(TileType::Gold);
+			else if (val == "T")  grid_row.push_back(TileType::Trap);
+			else if (val == "L")  grid_row.push_back(TileType::Locker);
+			else if (val == "B")  grid_row.push_back(TileType::Boss);
+			else                  grid_row.push_back(TileType::Empty);
+		}
+		simple_grid.push_back(grid_row);
+	}
+	cols = simple_grid[0].size();
+	rows = simple_grid.size();
+
+	grid.clear();
+	grid.resize(rows, std::vector<Tile*>(cols, new Tile()));
+
+	gold_pos.clear();
+	trap_pos.clear();
+	for (int j = 0; j < rows; j++)
+	{
+		for (int i = 0; i < cols; i++)
+		{
+			switch (simple_grid[j][i])
 			{
 			case TileType::Wall:
 				grid[i][j] = new Tile(TileType::Wall);
@@ -405,6 +477,7 @@ void MazeLayer::load_maze_from_json(const std::vector<std::vector<TileType>>& si
 			case TileType::End:
 				grid[i][j] = new End();
 				end_pos = { (float)i, (float)j };
+				break;
 			case TileType::Gold:
 				grid[i][j] = new Gold(100);
 				gold_pos.emplace_back((float)i, (float)j);
@@ -414,10 +487,40 @@ void MazeLayer::load_maze_from_json(const std::vector<std::vector<TileType>>& si
 				trap_pos.emplace_back((float)i, (float)j);
 				break;
 			case TileType::Locker:
-				grid[i][j] = new Locker();
+			{
+				Locker* l = new Locker();
+				std::vector<std::vector<int>> clue;
+				if (root.isMember("C") && root["C"].isArray())
+				{
+					for (const auto& row : root["C"])
+					{
+						if (!row.isArray()) continue;
+						std::vector<int> temp;
+						for (const auto& val : row) {
+							temp.push_back(val.asInt());
+						}
+						clue.push_back(temp);
+					}
+					l->set_clue(clue);
+				}
+				if (root.isMember("L") && root["L"].isString())
+				{
+					auto p = CrackingSession::hashToPassword(root["L"].asString());
+					l->set_password(std::stoi(p));
+				}
+				grid[i][j] = l;
+				locker_pos = { (float)i, float(j) };
+				break;
+			}
+			case TileType::Boss:
+			{
+				grid[i][j] = new Boss();
+				break;
+			}
 			default:
 				break;
 			}
+			grid[i][j]->set_pos({ (float)i, (float)j });
 		}
 	}
 }
@@ -548,7 +651,7 @@ std::vector<Vector2> MazeLayer::get_coins_pos() const
 	return coins_pos;
 }
 
-void MazeLayer::save_maze_to_json(const std::vector<std::vector<TileType>>& maze, const std::string& filename, unsigned int seed)
+void MazeLayer::save_maze_to_json(const std::vector<std::vector<TileType>>& maze, const std::string& filename, unsigned int seed, MazeLayer& ml)
 {
 	Json::Value root;
 	Json::Value maze_array(Json::arrayValue);
@@ -596,6 +699,19 @@ void MazeLayer::save_maze_to_json(const std::vector<std::vector<TileType>>& maze
 	root["maze"] = maze_array;
 	root["seed"] = seed;
 
+	auto path = OptimalPath::find_best_path(ml.get_start_pos(), ml.get_end_pos(), ml.get_coins_pos(), ml.get_simple_grid(), ml.get_resource_grid());
+	Json::Value json_path(Json::arrayValue); 
+
+	for (const auto& vec : path.path) 
+	{
+		Json::Value point(Json::arrayValue); 
+		point.append((int)vec.y);
+		point.append((int)vec.x);
+		json_path.append(point);
+	}
+
+	root["optimal_path"] = json_path;
+
 	std::ofstream ofs(filename);
 	if (!ofs.is_open())
 	{
@@ -618,7 +734,7 @@ void MazeLayer::generate_multiple_mazes(int count, int rows, int cols)
 		maze.generate(false); 
 
 		std::string filename = "maze_result/maze_" + std::to_string(i + 1) + ".json";
-		save_maze_to_json(maze.get_simple_grid(), filename, seed);
+		save_maze_to_json(maze.get_simple_grid(), filename, seed, maze);
 	}
 }
 
@@ -661,45 +777,15 @@ void Maze::reset(int layer, int row, int col)
 
 void Maze::load_maze_from_json(std::wstring filename)
 {
-	std::ifstream ifs(filename);
-	if (!ifs.is_open()) 
-	{
-		std::cerr << "无法打开文件: " << filename.c_str() << std::endl;
-		return ;
-	}
-
-	Json::Value root;
-	Json::CharReaderBuilder builder;
-	std::string errs;
-	Json::parseFromStream(builder, ifs, &root, &errs);
-
-	std::vector<std::vector<TileType>> simple_maze;
-
-	const auto& json_maze = root["maze"];
-	for (const auto& row : json_maze) 
-	{
-		std::vector<TileType> maze_row;
-		for (const auto& cell : row) 
-		{
-			std::string val = cell.asString();
-			if (val == "#")       maze_row.push_back(TileType::Wall);
-			else if (val == " ")  maze_row.push_back(TileType::Path);
-			else if (val == "S")  maze_row.push_back(TileType::Start);
-			else if (val == "E")  maze_row.push_back(TileType::End);
-			else if (val == "G")  maze_row.push_back(TileType::Gold);
-			else if (val == "T")  maze_row.push_back(TileType::Trap);
-			else if (val == "L")  maze_row.push_back(TileType::Locker);
-			else if (val == "B")  maze_row.push_back(TileType::Boss);
-			else                  maze_row.push_back(TileType::Empty);
-		}
-		simple_maze.push_back(maze_row);
-	}
-	cols = simple_maze[0].size();
-	rows = simple_maze.size();
 	layers = 1;
 	maze.clear();
 
 	MazeLayer ml(rows,cols);
-	ml.load_maze_from_json(simple_maze);
+	ml.load_maze_from_json(filename);
+
+	rows = ml.getRows();
+	cols = ml.getCols();
+	maze.push_back(ml);
+
 }
 

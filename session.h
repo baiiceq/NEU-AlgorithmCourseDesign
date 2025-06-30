@@ -23,12 +23,37 @@ public:
     // 接收一个哈希值，并尝试将其破解为三位数密码
     static std::string hashToPassword(const std::string& hash_to_crack);
 
+    std::vector<std::string> get_attempts()
+    {
+        if (attempts1.size() < attempts2.size())
+            return attempts1;
+        else
+            return attempts2;
+    }
+
+    std::vector<std::string> get_attempts1()
+    {
+        return attempts1;
+    }
+
+    std::vector<std::string> get_attempts2()
+    {
+        return attempts2;
+    }
+
+    void set_clue(std::vector<std::vector<int>> clue)
+    {
+        clues_ = clue;
+    }
+
 private:
     // --- 私有成员变量 ---
     std::string originalPassword_;
     std::vector<std::vector<int>> clues_;
     // 用于存储从 cracker 获取的破解方向
     int lastCrackDirection_;
+    std::vector<std::string> attempts1;
+    std::vector<std::string> attempts2;
 
     // --- 私有辅助方法 ---
     void setupTargetPassword(const std::string& password_to_set);

@@ -13,7 +13,6 @@ CrackingSession::CrackingSession() : lastCrackDirection_(-1) {}
 // 主运行方法，协调整个流程
 void CrackingSession::run(const std::string& target_password) {
     setupTargetPassword(target_password);
-    gatherClues();
     executeAndReport();
 }
 
@@ -79,45 +78,35 @@ void CrackingSession::executeAndReport() {
         cracker.addClue(clue);
     }
     std::cout << "\n正在根据线索破译密码..." << std::endl;
-    std::string result = cracker.crack();
-
-    // --- NEW --- 获取并存储破解方向，并打印给用户
-    lastCrackDirection_ = cracker.getCrackDirection();
-    std::cout << "本次随机选择的破解方向: "
-        << (lastCrackDirection_ == 1 ? "逆序 (999 -> 000)" : "正序 (000 -> 999)")
-        << std::endl;
-
+    std::string result = cracker.crack(1);
 
     int coinsDeducted = cracker.getDeductedCoins();
-    const auto& attempts = cracker.getAttemptedPasswords();
+    attempts1 = cracker.getAttemptedPasswords();
 
     std::cout << "----------------------------------------" << std::endl;
-    std::cout << "所有符合线索的有效猜测 (" << attempts.size() << " 个):" << std::endl;
-    if (attempts.empty()) {
+    std::cout << "所有符合线索的有效猜测 (" << attempts1.size() << " 个):" << std::endl;
+    if (attempts1.empty()) {
         std::cout << "(无)" << std::endl;
     }
     else {
-        for (size_t i = 0; i < attempts.size(); ++i) {
-            std::cout << attempts[i] << ((i % 10 == 9 || i == attempts.size() - 1) ? "\n" : ", ");
+        for (size_t i = 0; i < attempts1.size(); ++i) {
+            std::cout << attempts1[i] << ((i % 10 == 9 || i == attempts1.size() - 1) ? "\n" : ", ");
         }
     }
-    std::cout << std::endl;
+    result = cracker.crack(0);
+    coinsDeducted = cracker.getDeductedCoins();
+    attempts2 = cracker.getAttemptedPasswords();
 
-    std::cout << "破译过程结束。总共扣除的金币数: " << coinsDeducted << std::endl;
-
-    if (!result.empty()) {
-        std::cout << "成功! 破译出的密码是: " << result << std::endl;
-        if (result == originalPassword_) {
-            std::cout << "验证通过：破译结果与原密码一致。" << std::endl;
-        }
-        else {
-            std::cout << "警告：破译结果与原密码不一致！可能是哈希碰撞或线索/代码逻辑错误。" << std::endl;
-        }
+    std::cout << "----------------------------------------" << std::endl;
+    std::cout << "所有符合线索的有效猜测 (" << attempts2.size() << " 个):" << std::endl;
+    if (attempts2.empty()) {
+        std::cout << "(无)" << std::endl;
     }
     else {
-        std::cout << "失败。未找到符合所有线索和哈希值的密码。" << std::endl;
+        for (size_t i = 0; i < attempts2.size(); ++i) {
+            std::cout << attempts2[i] << ((i % 10 == 9 || i == attempts2.size() - 1) ? "\n" : ", ");
+        }
     }
-    std::cout << "----------------------------------------" << std::endl;
 }
 
 // 从 main.cpp 移过来的辅助函数

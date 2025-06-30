@@ -15,8 +15,8 @@ public:
     // 添加一条密码线索
     void addClue(const std::vector<int>& clue);
 
-    // 开始破译过程，返回找到的密码或一个空字符串
-    std::string crack();
+    std::string crack(int mode);
+
 
     // 获取因密码错误而扣除的金币总数
     int getDeductedCoins() const;

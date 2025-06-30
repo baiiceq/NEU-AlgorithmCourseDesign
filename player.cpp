@@ -221,6 +221,23 @@ bool Player::move_to(Vector2 pos, MazeLayer& ml)
 	return false;
 }
 
+void Player::reset()
+{
+	resource = 1000;
+
+	is_facing_right = true;
+	is_idle = true;
+
+	is_running_right = false;
+	is_running_left = false;
+	is_running_up = false;
+	is_running_down = false;
+
+	is_exit = false;
+	is_locker = false;
+	is_boss = false;
+}
+
 void Player::set_position(Vector2 pos)
 {
 	this->pos = pos;

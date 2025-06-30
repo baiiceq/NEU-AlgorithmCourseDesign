@@ -1,8 +1,6 @@
 #pragma once
 #include <string>
 #include <functional>
-
-#include "skill.h"
 #include "vector2.h"
 #include "animation.h"
 #include <graphics.h>
@@ -22,6 +20,8 @@ public:
     void on_render();
 
     bool move_to(Vector2 pos, MazeLayer& ml);
+
+    void reset();
 
 	void set_position(Vector2 pos);
     Vector2 get_pos() const
@@ -54,10 +54,20 @@ public:
         is_locker = b;
     }
 
-	bool get_is_locker() const
+	bool get_is_boss() const
 	{
-		return is_locker;
+		return is_boss;
 	}
+
+    void set_is_boss(bool b)
+    {
+        is_boss = b;
+    }
+
+    bool get_is_locker() const
+    {
+        return is_locker;
+    }
 
     void run_reset()
     {
@@ -66,13 +76,6 @@ public:
         is_running_right = false;
         is_running_left = false;
     }
-    int getHealth() const;
-    void addHealth(int val);
-    void reduceHealth(int val);
-
-    std::vector<Skill>& getSkills();
-    void resetSkillCooldowns();
-    void updateCooldowns();
 
 private:
     Vector2 pos;
@@ -81,8 +84,6 @@ private:
     int resource;
     int health;
     int maxHealth;
-
-    std::vector<Skill> skills;
       
     bool is_facing_right = true;
     bool is_idle = true;
@@ -99,6 +100,7 @@ private:
 
     bool is_exit = false;
     bool is_locker = false;
+    bool is_boss = false;
 
 	const int RUN_TIME = 150; // 移动一格的时间 
     Timer timer_move;
