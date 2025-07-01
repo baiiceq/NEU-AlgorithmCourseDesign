@@ -36,7 +36,10 @@ void GreedyPick::PickGoldLayer(MazeLayer& mazelayer)
 		path.push_back(end);
 		path = avoidTrap(path, mazelayer);
 	}
-	path.push_back(end);
+	else
+	{
+		path.push_back(end);
+	}
 	Vector2 step = path[0];
 	int i = 0;
 	while (!(step == end))
@@ -78,7 +81,10 @@ void GreedyPick::PickGoldLayer(MazeLayer& mazelayer)
 				path.push_back(end);
 				path = avoidTrap(path, mazelayer);
 			}
-			path.push_back(end);
+			else
+			{
+				path.push_back(end);
+			}
 			step = path[0];
 			i = 0;
 			continue;
@@ -108,13 +114,13 @@ void GreedyPick::findNearestGold(std::set<Vector2>& is_Pick, MazeLayer& mazelaye
 		Gold* gold = dynamic_cast<Gold*>(tile);
 		if (gold && is_Pick.find(curr)!=is_Pick.end()) 
 		{
-			// ÕÒµ½×ÊÔ´ÁË£¬»ØËİÂ·¾¶
+			// æ‰¾åˆ°èµ„æºäº†ï¼Œå›æº¯è·¯å¾„
 			std::vector<Vector2> path;
 			Vector2 p = curr;
 			for (Vector2 p = curr; !(p == pos); p = parent[p])
 				path.push_back(p);
 
-			std::reverse(path.begin(), path.end()); // ´Ó start µ½Ä¿±ê
+			std::reverse(path.begin(), path.end()); // ä» start åˆ°ç›®æ ‡
 			for (auto step : path)
 				Path.push_back(step);
 			pos = curr;
@@ -123,7 +129,7 @@ void GreedyPick::findNearestGold(std::set<Vector2>& is_Pick, MazeLayer& mazelaye
 		}
 
 		for (int i = 0; i < 4; i++) {
-			Vector2 next = curr + moving1[i]; // moving[] ÎªÉÏÏÂ×óÓÒ
+			Vector2 next = curr + moving1[i]; // moving[] ä¸ºä¸Šä¸‹å·¦å³
 			if (!in_bounds(next, mazelayer)) continue;
 			if (visited.count(next)) continue;
 
@@ -179,7 +185,7 @@ std::vector<Vector2> GreedyPick::moveTonext(Vector2 end, const MazeLayer& mazela
 		}
 	}
 
-	// Èç¹ûÁ¬³ö¿Ú¶¼µ½²»ÁË£¬¿ÉÒÔ¼ÇÂ¼Ê§°Ü»òÕß±¨´í
+	// å¦‚æœè¿å‡ºå£éƒ½åˆ°ä¸äº†ï¼Œå¯ä»¥è®°å½•å¤±è´¥æˆ–è€…æŠ¥é”™
 	std::cerr << "Warning: Cannot reach exit!" << std::endl;
 	return {};
 }
@@ -193,7 +199,7 @@ std::vector<Vector2> GreedyPick::avoidTrap(const std::vector<Vector2>& path, con
 
 		if (mazelayer.get_tile(step.x,step.y)->get_type()==TileType::Trap) 
 		{
-			// ³¢ÊÔÈÆ¹ıÏİÚå
+			// å°è¯•ç»•è¿‡é™·é˜±
 			bool avoided = false;
 			Vector2 last;
 			if (!adjusted_path.empty())
@@ -217,12 +223,12 @@ std::vector<Vector2> GreedyPick::avoidTrap(const std::vector<Vector2>& path, con
 			}
 			if (!avoided) 
 			{
-				adjusted_path.push_back(step); // ÊµÔÚÈÆ²»¹ı£¬Ó²×ßÏİÚå
+				adjusted_path.push_back(step); // å®åœ¨ç»•ä¸è¿‡ï¼Œç¡¬èµ°é™·é˜±
 			}
 		}
 		else 
 		{
-			adjusted_path.push_back(step); // Õı³£ tile
+			adjusted_path.push_back(step); // æ­£å¸¸ tile
 		}
 	}
 	return adjusted_path;
